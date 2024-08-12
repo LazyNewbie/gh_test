@@ -1,0 +1,12 @@
+vendor/*
+data/
+/.vagrant
+.idea/
+/nbproject
+sample.php
+.buildpath
+.project
+.settings/*
+.DS_Store
+.phpunit.result.cache
+build/
