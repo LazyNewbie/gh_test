@@ -15,20 +15,42 @@ jobs:
         with:
           php-version: '8.1'
           tools: php-cs-fixer:3.4.0
-          extensions: memcached
 
       - name: Checkout repository
         uses: actions/checkout@v2
         with:
           path: repo
 
-      - name: Composer update
-        uses: php-actions/composer@v5
-        with:
-          command: update
-          args: --with-all-dependencies --optimize-autoloader --prefer-dist --ignore-platform-reqs --working-dir=repo
+      - name: Install dependencies
+        run: |
+          cd repo
+          composer install
+
+      #      - name: "Upload coverage data"
+      #        uses: actions/upload-artifact@v3
+      #        with:
+      #          name: covdata
+      #          path: gh_output/clover.xml
+
 
       - name: Run test suite
         run: |
           cd repo
-          composer run-script test
+          composer run-script test:coverage
+          ls -la .
+
+      - name: Make code coverage badge
+        uses: timkrase/phpunit-coverage-badge@v1.2.1
+        with:
+          report: ${{ GITHUB_WORKSPACE }}/coverage/clover.xml
+          coverage_badge_path: output/coverage.svg
+          push_badge: false
+
+      - name: Git push to image-data branch
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          publish_dir: ./output
+          publish_branch: image-data
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          user_name: 'github-actions[bot]'
+          user_email: 'alexey@exads.com'
