@@ -41,7 +41,7 @@ jobs:
 
 
       - name: Make code coverage badge
-        uses: timkrase/phpunit-coverage-badge@v1.2.1
+        uses: timkrase/phpunit-coverage-badge2
         with:
           report: repo/coverage/clover.xml
           coverage_badge_path: output/coverage.svg
@@ -52,7 +52,7 @@ jobs:
         uses: peaceiris/actions-gh-pages@v3
         with:
           publish_dir: ./output
-          publish_branch: image-data
+          publish_branch: bages-data
           github_token: ${{ secrets.GITHUB_TOKEN }}
           user_name: 'github-actions[bot]'
           user_email: 'alexey@exads.com'
