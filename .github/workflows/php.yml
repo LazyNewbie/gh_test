@@ -40,19 +40,12 @@ jobs:
           composer run-script test:coverage
 
 
-      - name: See locals
-        run: |
-          ls -la .
-          ls -la repo 
-
-
       - name: Make code coverage badge
         uses: timkrase/phpunit-coverage-badge@v1.2.1
         with:
-          report: coverage/clover.xml
+          report: repo/coverage/clover.xml
           coverage_badge_path: output/coverage.svg
           push_badge: false
-
 
 
       - name: Git push to image-data branch
