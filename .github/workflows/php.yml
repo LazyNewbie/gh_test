@@ -49,12 +49,8 @@ jobs:
         uses: timkrase/phpunit-coverage-badge@v1.2.1
         with:
           report: 'repo/coverage/clover.xml'
-          coverage_badge_path: output/coverage.svg
+          coverage_badge_path: ./output/coverage.svg
           push_badge: false
-
-      - name: LS -LA output
-        run: |
-          ls -la repo/output
 
       - name: LS -LA ./output
         run: |
@@ -64,5 +60,5 @@ jobs:
         uses: peaceiris/actions-github-pages@v3.1.12
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: repo/output
+          publish_dir: ./output
           publish_branch: bages-data
