@@ -39,20 +39,30 @@ jobs:
           cd repo
           composer run-script test:coverage
 
+      - name: PHPUnit Coverage Check
+        uses: ericsizemore/phpunit-coverage-check-action@1.0.1
+        with:
+          clover_file: 'repo/coverage/clover.xml'
+          threshold: 70
 
       - name: Make code coverage badge
         uses: timkrase/phpunit-coverage-badge@v1.2.1
         with:
-          report: repo/coverage/clover.xml
+          report: 'repo/coverage/clover.xml'
           coverage_badge_path: output/coverage.svg
           push_badge: false
 
+      - name: LS -LA output
+        run: |
+          ls -la repo/output
 
-      - name: Git push to image-data branch
-        uses: peaceiris/actions-gh-pages@v3
+      - name: LS -LA ./output
+        run: |
+          ls -la ./output
+
+      - name: GitHub Pages v3
+        uses: peaceiris/actions-github-pages@v3.1.12
         with:
-          publish_dir: ./output
-          publish_branch: bages-data
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          user_name: 'github-actions[bot]'
-          user_email: 'alexey@exads.com'
+          publish_dir: repo/output
+          publish_branch: bages-data
