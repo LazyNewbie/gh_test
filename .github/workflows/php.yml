@@ -59,6 +59,7 @@ jobs:
       - name: GitHub Pages v3
         uses: peaceiris/actions-github-pages@v3.1.12
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
+          deploy_key: ${{ secrets.ACTIONS_DEPLOY_KEY }}
           publish_dir: ./output
           publish_branch: bages-data
+          commit_message: ${{ github.event.head_commit.message }}
