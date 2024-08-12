@@ -1,4 +1,4 @@
-name: EXADS Pipeline
+name: PHP Pipeline
 
 on:
   pull_request:
@@ -21,7 +21,6 @@ jobs:
         with:
           path: repo
 
-          
 
       - name: Install dependencies
         run: |
@@ -44,7 +43,7 @@ jobs:
       - name: Make code coverage badge
         uses: timkrase/phpunit-coverage-badge@v1.2.1
         with:
-          report: ${{ GITHUB_WORKSPACE }}/coverage/clover.xml
+          report: coverage/clover.xml
           coverage_badge_path: output/coverage.svg
           push_badge: false
 
