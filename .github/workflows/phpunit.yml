@@ -1,0 +1,106 @@
+name: EXADS Pipeline
+
+on:
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  run-tests:
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Setup environment
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.1'
+          tools: php-cs-fixer:3.4.0
+          extensions: memcached
+
+      - name: Checkout repository
+        uses: actions/checkout@v2
+        with:
+          path: repo
+
+      - name: PHP CS Fixer
+        run: |
+          cd repo
+          php-cs-fixer fix --diff --rules=@PSR12 --verbose --dry-run
+
+      - name: Validate composer.json and composer.lock
+        run: |
+          cd repo
+          composer validate
+
+      - name: Checkout exads-common
+        uses: actions/checkout@v2
+        with:
+          repository: EXADS/exads-common
+          token: ${{ secrets.EXADSBOT_TOKEN_ACTIONS }}
+          path: exads-common
+          ref: master
+
+      - name: Checkout exads-core
+        uses: actions/checkout@v2
+        with:
+          repository: EXADS/exads-core
+          token: ${{ secrets.EXADSBOT_TOKEN_ACTIONS }}
+          path: exads-core
+          ref: master
+
+      - name: Checkout phpincludes
+        uses: actions/checkout@v2
+        with:
+          repository: EXADS/phpincludes
+          token: ${{ secrets.EXADSBOT_TOKEN_ACTIONS }}
+          path: phpincludes
+          ref: master
+
+      - name: Find out correct branches
+        id: dependency-branches
+        shell: bash
+        run: |
+          cd exads-common
+          git pull
+          git ls-remote . ${{ github.event.pull_request.head.ref }}
+          if [ `git ls-remote . ${{ github.event.pull_request.head.ref }} | wc -l` -ge 1 ]; then
+            echo "::set-output name=exads-common-branch-name::${{ github.event.pull_request.head.ref }}"
+          else
+            echo "::set-output name=exads-common-branch-name::master"
+          fi
+          cd ../exads-core
+          git pull
+          git ls-remote . ${{ github.event.pull_request.head.ref }}
+          if [ `git ls-remote . ${{ github.event.pull_request.head.ref }} | wc -l` -ge 1 ]; then
+            echo "::set-output name=exads-core-branch-name::${{ github.event.pull_request.head.ref }}"
+          else
+            echo "::set-output name=exads-core-branch-name::master"
+          fi
+          cd ../phpincludes
+          git pull
+          git ls-remote . ${{ github.event.pull_request.head.ref }}
+          if [ `git ls-remote . ${{ github.event.pull_request.head.ref }} | wc -l` -ge 1 ]; then
+            echo "::set-output name=phpincludes-branch-name::${{ github.event.pull_request.head.ref }}"
+          else
+            echo "::set-output name=phpincludes-branch-name::master"
+          fi
+
+      - name: Replace branches dependency version
+        shell: bash
+        run: |
+          cd repo
+          sed -i "s;exads/exads-common\": \"\*\";exads/exads-common\": \"dev-${{ steps.dependency-branches.outputs.exads-common-branch-name }}\";" composer.json
+          sed -i "s;exads/exads-core\": \"\*\";exads/exads-core\": \"dev-${{ steps.dependency-branches.outputs.exads-core-branch-name }}\";" composer.json
+          sed -i "s;exads/phpincludes\": \"\*\";exads/phpincludes\": \"dev-${{ steps.dependency-branches.outputs.phpincludes-branch-name }}\";" composer.json
+
+      - name: Composer update exads-core exads-common and phpincludes
+        uses: php-actions/composer@v5
+        with:
+          ssh_key: ${{ secrets.EXADSBOT_ACTIONS_SSH_KEY }}
+          command: update exads/exads-core exads/exads-common exads/phpincludes
+          args: --with-all-dependencies --optimize-autoloader --prefer-dist --ignore-platform-reqs --working-dir=repo
+
+      - name: Run test suite
+        run: |
+          cd repo
+          composer run-script test
