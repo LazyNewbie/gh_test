@@ -38,7 +38,13 @@ jobs:
         run: |
           cd repo
           composer run-script test:coverage
+
+
+      - name: See locals
+        run: |
           ls -la .
+          ls -la /github/workspace/coverage/clover.xml
+
 
       - name: Make code coverage badge
         uses: timkrase/phpunit-coverage-badge@v1.2.1
