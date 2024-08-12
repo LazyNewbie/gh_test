@@ -41,7 +41,7 @@ jobs:
 
 
       - name: Make code coverage badge
-        uses: timkrase/phpunit-coverage-badge2
+        uses: timkrase/phpunit-coverage-badge@v1.2.1
         with:
           report: repo/coverage/clover.xml
           coverage_badge_path: output/coverage.svg
