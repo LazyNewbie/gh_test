@@ -18,6 +18,7 @@
   "scripts": {
     "test": [
       "vendor/bin/phpunit"
-    ]
+    ],
+    "test:coverage": "@php -dxdebug.mode=coverage ./vendor/bin/phpunit --coverage-clover ./coverage/clover.xml"
   }
 }
