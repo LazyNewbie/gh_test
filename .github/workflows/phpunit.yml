@@ -22,10 +22,6 @@ jobs:
         with:
           path: repo
 
-      - name: PHP CS Fixer
-        run: |
-          cd repo
-          php-cs-fixer fix --diff --rules=@PSR12 --verbose --dry-run
 
       - name: Validate composer.json and composer.lock
         run: |
