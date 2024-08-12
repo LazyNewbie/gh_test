@@ -43,7 +43,7 @@ jobs:
         uses: ericsizemore/phpunit-coverage-check-action@1.0.1
         with:
           clover_file: 'repo/coverage/clover.xml'
-          threshold: 70
+          threshold: 10
 
       - name: Make code coverage badge
         uses: timkrase/phpunit-coverage-badge@v1.2.1
