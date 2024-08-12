@@ -43,7 +43,7 @@ jobs:
       - name: See locals
         run: |
           ls -la .
-          ls -la /github/workspace/coverage/clover.xml
+          ls -la repo 
 
 
       - name: Make code coverage badge
