@@ -22,6 +22,12 @@ jobs:
         with:
           path: repo
 
+      - name: Composer update
+        uses: php-actions/composer@v5
+        with:
+          command: update
+          args: --with-all-dependencies --optimize-autoloader --prefer-dist --ignore-platform-reqs --working-dir=repo
+
       - name: Run test suite
         run: |
           cd repo
