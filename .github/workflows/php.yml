@@ -61,13 +61,23 @@ jobs:
           publish_branch: bages-data
           commit_message: ${{ github.event.head_commit.message }}
 
-      - name: Leave comment on PR
+      - name: Leave PR summary
         uses: actions/github-script@v6
         with:
           script: |
+            let summaries = github.rest.issues.listComments({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+            });
+            console.info(summaries);
+            summaries.forEach((item)=>{
+              console.log(item);
+            })
+            
             github.rest.issues.createComment({
               issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
-              body: '👋 Thanks for reporting!'
+              body: '👋 Thanks for reporting! <img src="https://raw.githubusercontent.com/LazyNewbie/gh_test/bages-data/coverage.svg?token=GHSAT0AAAAAACSKF3SV44NSCO477CUPHXS6ZV3EPBA">'
             })
