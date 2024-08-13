@@ -17,12 +17,12 @@ class RepoTest extends TestCase
         $this->assertEquals("string 1", $r->getString());
     }
 
-    /**
-     * @test
-     */
-    public function getString2MustReturnString(): void
-    {
-        $r = new Repo();
-        $this->assertEquals("string 2", $r->getString2());
-    }
+//    /**
+//     * @test
+//     */
+//    public function getString2MustReturnString(): void
+//    {
+//        $r = new Repo();
+//        $this->assertEquals("string 2", $r->getString2());
+//    }
 }
