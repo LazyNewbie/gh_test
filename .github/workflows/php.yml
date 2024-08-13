@@ -38,13 +38,13 @@ jobs:
         run: |
           cd repo
           composer run-script test:coverage
-      
 
-      #      - name: PHPUnit Coverage Check
-      #        uses: ericsizemore/phpunit-coverage-check-action@1.0.1
-      #        with:
-      #          clover_file: 'repo/coverage/clover.xml'
-      #          threshold: 10
+
+      - name: PHPUnit Coverage Check
+        uses: ericsizemore/phpunit-coverage-check-action@1.0.1
+        with:
+          clover_file: 'repo/coverage/clover.xml'
+          threshold: 10
 
       #      - name: Make code coverage badge
       #        uses: timkrase/phpunit-coverage-badge@v1.2.1
@@ -95,9 +95,3 @@ jobs:
           with-chart: false
           with-table: false
           file: repo/coverage/clover.xml
-
-      - name: Clover Code Coverage Summary
-        uses: saschanowak/CloverCodeCoverageSummary@1.0.1
-        if: github.event_name == 'pull_request'
-        with:
-          filename: 'repo/coverage/clover.xml'
