@@ -39,15 +39,6 @@ jobs:
           cd repo
           composer run-script test:coverage
       
-      
-      #      - name: Clover Code Coverage Summary
-      #        uses: saschanowak/CloverCodeCoverageSummary@1.0.1
-      #        if: github.event_name == 'pull_request'
-      #        with:
-      #          filename: 'repo/coverage/clover.xml'
-      #          recreate: true
-      #          path: code-coverage-summary.md
-
 
       #      - name: PHPUnit Coverage Check
       #        uses: ericsizemore/phpunit-coverage-check-action@1.0.1
@@ -102,3 +93,11 @@ jobs:
         uses: lucassabreu/comment-coverage-clover@v0.13.0
         with:
           file: repo/coverage/clover.xml
+
+      - name: Clover Code Coverage Summary
+        uses: saschanowak/CloverCodeCoverageSummary@1.0.1
+        if: github.event_name == 'pull_request'
+        with:
+          filename: 'repo/coverage/clover.xml'
+          recreate: true
+          path: code-coverage-summary.md
