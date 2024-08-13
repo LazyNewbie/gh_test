@@ -92,6 +92,8 @@ jobs:
       - name: Coverage Report as Comment (Clover)
         uses: lucassabreu/comment-coverage-clover@v0.13.0
         with:
+          with-chart: false
+          with-table: false
           file: repo/coverage/clover.xml
 
       - name: Clover Code Coverage Summary
