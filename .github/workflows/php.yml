@@ -38,11 +38,6 @@ jobs:
         run: |
           cd repo
           composer run-script test:coverage
-
-      - name: Coverage Report as Comment (Clover)
-        uses: lucassabreu/comment-coverage-clover@v0.13.0
-        with:
-          file: repo/coverage/clover.xml
       
       
       #      - name: Clover Code Coverage Summary
@@ -102,3 +97,8 @@ jobs:
               repo: context.repo.repo,
               body: '👋 Thanks for reporting! <img src="https://raw.githubusercontent.com/LazyNewbie/gh_test/bages-data/coverage.svg?token=GHSAT0AAAAAACSKF3SV44NSCO477CUPHXS6ZV3EPBA">'
             })
+
+      - name: Coverage Report as Comment (Clover)
+        uses: lucassabreu/comment-coverage-clover@v0.13.0
+        with:
+          file: repo/coverage/clover.xml
