@@ -70,7 +70,16 @@ jobs:
               owner: context.repo.owner,
               repo: context.repo.repo,
             });
-            console.log(summaries);
+
+            summaries.forEach((summary)=>{              
+              deleteComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                summary.id,
+              });
+            })
+            
+            console.info("Old summaries deleted: " + summaries.length)
             
             github.rest.issues.createComment({
               issue_number: context.issue.number,
