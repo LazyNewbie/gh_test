@@ -38,7 +38,7 @@ jobs:
         with:
           script: |
             const CODE_COVERAGE_THRESHOLD = 0;
-            const reportFile = "./coverageSummary.txt";
+            const reportFile = "coverage/coverageSummary.txt";
             
             require('fs').readFile(reportFile, (err, buffer)=>{
               let summary = parseSummary(buffer.toString());              
@@ -84,22 +84,22 @@ jobs:
               owner: context.repo.owner,
               repo: context.repo.repo,
             }).then((response)=>{
-              let createNew = true;
-              for(const message of response.data){
-                if(message.user.type == "Bot"){
-                  msgToPush.comment_id = message.id;
-                  createNew = false;
-                  break;
-                }
-              }            
-              if(createNew){
-                github.rest.issues.createComment(msgToPush);
-              }else{
-                github.rest.issues.updateComment(msgToPush);
-              }          
-            }, error => {
-              throw new Error(error);
-            });
-      }
+                let createNew = true;
+                for(const message of response.data){
+                  if(message.user.type == "Bot"){
+                    msgToPush.comment_id = message.id;
+                    createNew = false;
+                    break;
+                  }
+                }            
+                if(createNew){
+                  github.rest.issues.createComment(msgToPush);
+                }else{
+                  github.rest.issues.updateComment(msgToPush);
+                }          
+              }, error => {
+                throw new Error(error);
+              });
+            }
 
 
