@@ -52,14 +52,11 @@ jobs:
           coverage_badge_path: ./output/coverage.svg
           push_badge: false
 
-      - name: LS -LA ./output
-        run: |
-          ls -la ./output
-
       - name: GitHub Pages v3
         uses: peaceiris/actions-github-pages@v3.1.12
         with:
-          deploy_key: ${{ secrets.ACTIONS_DEPLOY_KEY }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          #       deploy_key: ${{ secrets.ACTIONS_DEPLOY_KEY }}
           publish_dir: ./output
           publish_branch: bages-data
           commit_message: ${{ github.event.head_commit.message }}
