@@ -71,6 +71,9 @@ jobs:
               repo: context.repo.repo,
             });
 
+            summaries = JSON.parse(summaries);
+            console.log(summaries);
+
             summaries.forEach((summary)=>{
               deleteComment({
                 owner: context.repo.owner,
