@@ -39,27 +39,36 @@ jobs:
           cd repo
           composer run-script test:coverage
 
-      - name: PHPUnit Coverage Check
-        uses: ericsizemore/phpunit-coverage-check-action@1.0.1
+      - name: Clover Code Coverage Summary
+        uses: saschanowak/CloverCodeCoverageSummary@1.0.1
+        if: github.event_name == 'pull_request'
         with:
-          clover_file: 'repo/coverage/clover.xml'
-          threshold: 10
+          filename: 'repo/coverage/clover.xml'
+          recreate: true
+          path: code-coverage-summary.md
 
-      - name: Make code coverage badge
-        uses: timkrase/phpunit-coverage-badge@v1.2.1
-        with:
-          report: 'repo/coverage/clover.xml'
-          coverage_badge_path: ./output/coverage.svg
-          push_badge: false
 
-      - name: GitHub Pages v4
-        uses: peaceiris/actions-gh-pages@v4.0.0
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          #       deploy_key: ${{ secrets.ACTIONS_DEPLOY_KEY }}
-          publish_dir: ./output
-          publish_branch: bages-data
-          commit_message: ${{ github.event.head_commit.message }}
+      #      - name: PHPUnit Coverage Check
+      #        uses: ericsizemore/phpunit-coverage-check-action@1.0.1
+      #        with:
+      #          clover_file: 'repo/coverage/clover.xml'
+      #          threshold: 10
+
+      #      - name: Make code coverage badge
+      #        uses: timkrase/phpunit-coverage-badge@v1.2.1
+      #        with:
+      #          report: 'repo/coverage/clover.xml'
+      #          coverage_badge_path: ./output/coverage.svg
+      #          push_badge: false
+      #
+      #      - name: GitHub Pages v4
+      #        uses: peaceiris/actions-gh-pages@v4.0.0
+      #        with:
+      #          github_token: ${{ secrets.GITHUB_TOKEN }}
+      #          #       deploy_key: ${{ secrets.ACTIONS_DEPLOY_KEY }}
+      #          publish_dir: ./output
+      #          publish_branch: bages-data
+      #          commit_message: ${{ github.event.head_commit.message }}
 
       - name: Leave PR summary
         uses: actions/github-script@v6
@@ -71,8 +80,6 @@ jobs:
               repo: context.repo.repo,
             });
 
-            console.log(summaries.data);
-
             summaries.data.forEach((summary)=>{
               github.rest.issues.deleteComment({
                 owner: context.repo.owner,
@@ -81,7 +88,7 @@ jobs:
               });
             });
             
-            console.info("Old summaries deleted: " + summaries.length);
+            console.info("Old summaries deleted: " + summaries.data.length);
             
             github.rest.issues.createComment({
               issue_number: context.issue.number,
