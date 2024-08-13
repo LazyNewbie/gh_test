@@ -19,6 +19,6 @@
     "test": [
       "vendor/bin/phpunit"
     ],
-    "test:coverage": "@php -dxdebug.mode=coverage ./vendor/bin/phpunit --coverage-clover ./coverage/clover.xml"
+    "test:coverage": "@php -dxdebug.mode=coverage ./vendor/bin/phpunit --coverage-text=./coverage/cover.txt --coverage-filter=src"
   }
 }
