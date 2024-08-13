@@ -70,10 +70,7 @@ jobs:
               owner: context.repo.owner,
               repo: context.repo.repo,
             });
-            console.info(summaries);
-            summaries.forEach((item)=>{
-              console.log(item);
-            })
+            console.log(summaries);
             
             github.rest.issues.createComment({
               issue_number: context.issue.number,
