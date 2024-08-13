@@ -71,15 +71,15 @@ jobs:
               repo: context.repo.repo,
             });
 
-            summaries.forEach((summary)=>{              
+            summaries.forEach((summary)=>{
               deleteComment({
                 owner: context.repo.owner,
                 repo: context.repo.repo,
-                summary.id,
+                comment_id: summary.id,
               });
-            })
+            });
             
-            console.info("Old summaries deleted: " + summaries.length)
+            console.info("Old summaries deleted: " + summaries.length);
             
             github.rest.issues.createComment({
               issue_number: context.issue.number,
