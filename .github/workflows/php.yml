@@ -52,8 +52,8 @@ jobs:
           coverage_badge_path: ./output/coverage.svg
           push_badge: false
 
-      - name: GitHub Pages v3
-        uses: peaceiris/actions-github-pages@v3.1.12
+      - name: GitHub Pages v4
+        uses: peaceiris/actions-gh-pages@v4.0.0
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           #       deploy_key: ${{ secrets.ACTIONS_DEPLOY_KEY }}
