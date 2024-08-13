@@ -74,7 +74,7 @@ jobs:
             console.log(summaries.data);
 
             summaries.data.forEach((summary)=>{
-              deleteComment({
+              github.rest.issues.deleteComment({
                 owner: context.repo.owner,
                 repo: context.repo.repo,
                 comment_id: summary.id,
