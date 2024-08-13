@@ -62,32 +62,32 @@ jobs:
       #          publish_branch: bages-data
       #          commit_message: ${{ github.event.head_commit.message }}
 
-      - name: Leave PR summary
-        uses: actions/github-script@v6
-        with:
-          script: |
-            let summaries = await github.rest.issues.listComments({
-              issue_number: context.issue.number,
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-            });
-
-            summaries.data.forEach((summary)=>{
-              github.rest.issues.deleteComment({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                comment_id: summary.id,
-              });
-            });
-            
-            console.info("Old summaries deleted: " + summaries.data.length);
-            
-            github.rest.issues.createComment({
-              issue_number: context.issue.number,
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              body: '👋 Thanks for reporting! <img src="https://raw.githubusercontent.com/LazyNewbie/gh_test/bages-data/coverage.svg?token=GHSAT0AAAAAACSKF3SV44NSCO477CUPHXS6ZV3EPBA">'
-            })
+      #      - name: Leave PR summary
+      #        uses: actions/github-script@v6
+      #        with:
+      #          script: |
+      #            let summaries = await github.rest.issues.listComments({
+      #              issue_number: context.issue.number,
+      #              owner: context.repo.owner,
+      #              repo: context.repo.repo,
+      #            });
+      #
+      #            summaries.data.forEach((summary)=>{
+      #              github.rest.issues.deleteComment({
+      #                owner: context.repo.owner,
+      #                repo: context.repo.repo,
+      #                comment_id: summary.id,
+      #              });
+      #            });
+      #
+      #            console.info("Old summaries deleted: " + summaries.data.length);
+      #
+      #            github.rest.issues.createComment({
+      #              issue_number: context.issue.number,
+      #              owner: context.repo.owner,
+      #              repo: context.repo.repo,
+      #              body: '👋 Thanks for reporting! <img src="https://raw.githubusercontent.com/LazyNewbie/gh_test/bages-data/coverage.svg?token=GHSAT0AAAAAACSKF3SV44NSCO477CUPHXS6ZV3EPBA">'
+      #            })
 
       - name: Coverage Report as Comment (Clover)
         uses: lucassabreu/comment-coverage-clover@v0.13.0
@@ -99,5 +99,3 @@ jobs:
         if: github.event_name == 'pull_request'
         with:
           filename: 'repo/coverage/clover.xml'
-          recreate: true
-          path: code-coverage-summary.md
