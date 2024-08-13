@@ -38,9 +38,10 @@ jobs:
         with:
           script: |
             const CODE_COVERAGE_THRESHOLD = 0;
-            const reportFile = "coverage/coverageSummary.txt";
+            const reportFile = "repo/coverage/coverageSummary.txt";
             
             require('fs').readFile(reportFile, (err, buffer)=>{
+              if(err) throw new Error(err);
               let summary = parseSummary(buffer.toString());              
               if(CODE_COVERAGE_THRESHOLD > summary.Total.percent){
                 throw new Error(thresholdErrorMessage(summary));
@@ -72,6 +73,8 @@ jobs:
               repo: context.repo.repo,
               body: ""
             };
+            
+            console.log(summary);
             
             msgToPush.body = "### Pull request summary\n";
             msgToPush.body += "Code coverage:\n";
