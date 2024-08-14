@@ -93,5 +93,5 @@ jobs:
         uses: lucassabreu/comment-coverage-clover@v0.13.0
         with:
           with-chart: false
-          with-table: false
+          with-table: true
           file: repo/coverage/clover.xml
