@@ -2,7 +2,7 @@
 
 namespace Exads\Repos;
 
-class Repo
+class Repo2
 {
 
     public function getString(): string
@@ -12,13 +12,6 @@ class Repo
 
     public function getString2(): string
     {
-
         return "string 2";
-    }
-
-    public function getString3(): string
-    {
-
-        return "string 3";
     }
 }

@@ -15,8 +15,9 @@ if (file_exists(__DIR__ . '/../../../vendor/autoload.php')) {
     // installed as a dependency in `vendor`
     $classLoader = require __DIR__ . '/../../../../../autoload.php';
 } else {
-    throw new Exception('Can\'t find autoload.php. Did you install dependencies via Composer?');
+    throw new Exception('Can\'t find autoload.php. Did you install dependencies via Composer? ');
 }
+
 
 // @var $classLoader \Composer\Autoload\ClassLoader
 $classLoader->add('Exads\\Test\\', __DIR__ . '/../../');
