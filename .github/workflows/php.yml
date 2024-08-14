@@ -27,24 +27,35 @@ jobs:
           cd repo
           composer install
 
-      #      - name: "Upload coverage data"
-      #        uses: actions/upload-artifact@v3
-      #        with:
-      #          name: covdata
-      #          path: gh_output/clover.xml
-
-
-      - name: Run test suite
-        run: |
-          cd repo
-          composer run-script test:coverage
-
-
-      - name: PHPUnit Coverage Check
-        uses: ericsizemore/phpunit-coverage-check-action@1.0.1
+      - name: Download master coverage report
+        uses: actions/download-artifact@v4
         with:
-          clover_file: 'repo/coverage/clover.xml'
-          threshold: 10
+          name: master_coverage_report.xml
+          path: repo/coverage/master_clover.xml
+
+
+      #      - name: Run test suite
+      #        run: |
+      #          cd repo
+      #          composer run-script test:coverage
+      #
+      #
+      #      - name: PHPUnit Coverage Check
+      #        uses: ericsizemore/phpunit-coverage-check-action@1.0.1
+      #        with:
+      #          clover_file: 'repo/coverage/clover.xml'
+      #          threshold: 10
+      #      - name: Coverage Report as Comment (Clover)
+      #        uses: lucassabreu/comment-coverage-clover@v0.13.0
+      #        with:
+      #          with-chart: false
+      #          with-table: true
+      #          file: repo/coverage/clover.xml
+
+
+
+
+
 
       #      - name: Make code coverage badge
       #        uses: timkrase/phpunit-coverage-badge@v1.2.1
@@ -89,9 +100,3 @@ jobs:
       #              body: '👋 Thanks for reporting! <img src="https://raw.githubusercontent.com/LazyNewbie/gh_test/bages-data/coverage.svg?token=GHSAT0AAAAAACSKF3SV44NSCO477CUPHXS6ZV3EPBA">'
       #            })
 
-      - name: Coverage Report as Comment (Clover)
-        uses: lucassabreu/comment-coverage-clover@v0.13.0
-        with:
-          with-chart: false
-          with-table: true
-          file: repo/coverage/clover.xml
