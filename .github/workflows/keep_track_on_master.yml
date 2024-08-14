@@ -1,0 +1,40 @@
+name: EXADS Pipeline
+
+on:
+  push:
+    branches: [ master ]
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Setup environment
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.1'
+
+      - name: Checkout repository
+        uses: actions/checkout@v2
+        with:
+          path: repo
+
+      - name: Install dependencies
+        run: |
+          cd repo
+          composer install
+
+      - name: Run test suite
+        run: |
+          cd repo
+          composer run-script test:coverage
+
+      - name: Upload master coverage report
+        uses: actions/upload-artifact@v4
+        with:
+          name: master_coverage_report.xml
+          path: repo/coverage/clover.xml
+          retention-days: 90
+          overwrite: true
+
+
