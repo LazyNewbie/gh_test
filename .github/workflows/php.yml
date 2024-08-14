@@ -74,8 +74,6 @@ jobs:
               body: ""
             };
             
-            console.log(summary);
-            
             msgToPush.body = "### Pull request summary\n";
             msgToPush.body += "Code coverage:\n";
             msgToPush.body += `**${summary.Methods.title}**: ${summary.Methods.percent}% ${summary.Methods.ratio}\n`;
