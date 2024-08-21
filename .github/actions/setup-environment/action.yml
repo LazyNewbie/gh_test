@@ -1,0 +1,24 @@
+name: 'CI environment setup'
+description: 'Shared config for all workflows setup'
+
+inputs:
+  root-dir:
+    description: "Current repository location"
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+    - name: Setup environment
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: '8.1'
+        tools: php-cs-fixer:3.4.0, phpunit, pecl
+        ini-values: pcre.jit=0, log_errors=1
+        extensions: memcached
+
+    - name: Validate composer.json and composer.lock
+      shell: bash
+      run: |
+        cd ${{ inputs.root-dir }}
+        composer install
