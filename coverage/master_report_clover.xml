@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<coverage generated="1724231451">
-  <project timestamp="1724231451">
-    <file name="/vagrant/code/github_actions_investigation/src/Exads/Repos/Repo.php">
+<coverage generated="1724247639">
+  <project timestamp="1724247639">
+    <file name="/home/runner/work/gh_test/gh_test/repo/src/Exads/Repos/Repo.php">
       <class name="Exads\Repos\Repo" namespace="global">
         <metrics complexity="3" methods="3" coveredmethods="2" conditionals="0" coveredconditionals="0" statements="3" coveredstatements="2" elements="6" coveredelements="4"/>
       </class>
@@ -13,7 +13,7 @@
       <line num="20" type="stmt" count="0"/>
       <metrics loc="22" ncloc="22" classes="1" methods="3" coveredmethods="2" conditionals="0" coveredconditionals="0" statements="3" coveredstatements="2" elements="6" coveredelements="4"/>
     </file>
-    <file name="/vagrant/code/github_actions_investigation/src/run.php">
+    <file name="/home/runner/work/gh_test/gh_test/repo/src/run.php">
       <line num="3" type="stmt" count="0"/>
       <line num="5" type="stmt" count="0"/>
       <line num="7" type="stmt" count="0"/>
