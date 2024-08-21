@@ -32,6 +32,6 @@ class RepoTest extends TestCase
     public function getString3MustReturnString(): void
     {
         $r = new Repo();
-        $this->assertEquals("string 3", $r->getString2());
+        $this->assertEquals("string 3", $r->getString3());
     }
 }
