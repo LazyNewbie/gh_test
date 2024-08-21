@@ -1,4 +1,4 @@
-name: EXADS Pipeline
+name: EXADS Pipeline 1
 
 on:
   pull_request:
@@ -32,9 +32,11 @@ jobs:
           cd repo
           composer run-script --timeout=0 test:run:coverage -- --coverage-clover=../gh_reports/coverage/pr_report_clover.xml
 
+
+
       - name: Create coverage report comment
         uses: lucassabreu/comment-coverage-clover@v0.13.0
         with:
-          with-chart: true
-          with-table: true
-          file: repo/coverage/clover.xml
+          with-chart: false
+          with-table: false
+          file: gh_reports/coverage/pr_report_clover.xml
