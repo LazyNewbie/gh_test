@@ -19,4 +19,10 @@ class Repo
     {
         return "string 3";
     }
+
+    public function getString4(): string
+    {
+        return "string 4";
+    }
+
 }
