@@ -1,7 +1,7 @@
 name: EXADS Pipeline
 
 on:
-  push:
+  pull_request:
     branches: [ master ]
 
 
