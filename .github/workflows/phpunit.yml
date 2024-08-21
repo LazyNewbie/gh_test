@@ -1,0 +1,40 @@
+name: EXADS Pipeline 1
+
+on:
+  pull_request:
+    branches: [ master ]
+
+
+
+jobs:
+  make-test-report:
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          path: repo
+
+      - name: Checkout gh-reports branch
+        uses: actions/checkout@v4
+        with:
+          ref: gh-reports
+          path: gh_reports
+
+      - name: Setup CI environment
+        uses: ./repo/.github/actions/setup-environment
+        with:
+          root-dir: repo
+
+      - name: Run test suite and get coverage report
+        run: |
+          cd repo
+          composer run-script --timeout=0 test:run:coverage -- --coverage-clover=../gh_reports/coverage/pr_report_clover.xml
+
+      - name: Create coverage report comment
+        uses: lucassabreu/comment-coverage-clover@v0.13.0
+        with:
+          with-chart: false
+          with-table: false
+          file: repo/coverage/clover.xml
