@@ -35,6 +35,7 @@ jobs:
       - name: Commit new masters coverage report
         shell: bash
         run: |
+          cd gh_reports
           git config user.name 'EXADS bot'
           git config user.email 'bot@exads.com'
           git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/$GITHUB_REPOSITORY
