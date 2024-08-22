@@ -38,4 +38,4 @@ jobs:
           with-chart: false
           with-table: false
           file: gh_reports/coverage/pr_report_clover.xml
-          base-file: repo/coverage/master_report_clover.xml
+          base-file: gh_reports/coverage/master_report_clover.xml
