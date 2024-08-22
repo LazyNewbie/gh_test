@@ -10,4 +10,9 @@ class Repo2
         return "string 1";
     }
 
+    public function getString2(): string
+    {
+        return "string 2";
+    }
+
 }
