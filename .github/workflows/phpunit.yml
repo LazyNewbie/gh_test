@@ -32,8 +32,6 @@ jobs:
           cd repo
           composer run-script --timeout=0 test:run:coverage -- --coverage-clover=../gh_reports/coverage/pr_report_clover.xml
 
-
-
       - name: Create coverage report comment
         uses: lucassabreu/comment-coverage-clover@v0.13.0
         with:
