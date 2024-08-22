@@ -36,5 +36,8 @@ jobs:
         uses: lucassabreu/comment-coverage-clover@v0.13.0
         with:
           with-chart: false
-          with-table: false
-          file: repo/coverage/clover.xml
+          with-table: true
+          table-coverage-change: true
+          show-percentage-change-on-table: true
+          file: gh_reports/coverage/pr_report_clover.xml
+          base-file: gh_reports/coverage/master_report_clover.xml

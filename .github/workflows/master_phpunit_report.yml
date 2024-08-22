@@ -39,5 +39,5 @@ jobs:
           git config user.name 'EXADS bot'
           git config user.email 'bot@exads.com'
           git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/$GITHUB_REPOSITORY
-          git commit -am "Automated report coverage report"
+          git commit -am "${{ github.event.head_commit.message }}"
           git push
