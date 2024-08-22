@@ -37,6 +37,7 @@ jobs:
         with:
           with-chart: false
           with-table: true
+          with-branches: false
           table-coverage-change: true
           show-percentage-change-on-table: true
           file: gh_reports/coverage/pr_report_clover.xml
