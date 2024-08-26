@@ -5,6 +5,15 @@ inputs:
   root-dir:
     description: "Current repository location"
     required: true
+  secrets_EXADSBOT_TOKEN_ACTIONS:
+    description: "secrets.EXADSBOT_TOKEN_ACTIONS"
+    required: true
+  secrets_EXADSBOT_ACTIONS_SSH_KEY:
+    description: "secrets.EXADSBOT_ACTIONS_SSH_KEY"
+    required: true
+  pull_request_head_ref:
+    description: "github.event.pull_request.head.ref"
+    required: true
 
 runs:
   using: "composite"
@@ -16,6 +25,16 @@ runs:
         tools: php-cs-fixer:3.4.0, phpunit, pecl
         ini-values: pcre.jit=0, log_errors=1
         extensions: memcached
+
+    - name: Show all values
+      shell: bash
+      run: |
+        echo "1: ${{ inputs.root-dir }}"
+        echo "2: ${{ inputs.secrets_EXADSBOT_TOKEN_ACTIONS }}"
+        echo "3: ${{ inputs.secrets_EXADSBOT_ACTIONS_SSH_KEY }}"
+        echo "4: ${{ inputs.pull_request_head_ref }}"
+
+
 
     - name: Validate composer.json and composer.lock
       shell: bash
