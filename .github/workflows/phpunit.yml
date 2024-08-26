@@ -16,31 +16,31 @@ jobs:
         with:
           path: repo
 
-      - name: Checkout gh-reports branch
-        uses: actions/checkout@v4
-        with:
-          ref: gh-reports
-          path: gh_reports
-
-      - name: Setup CI environment
-        uses: ./repo/.github/actions/setup-environment
-        with:
-          root-dir: repo
-          secrets_EXADSBOT_TOKEN_ACTIONS: ${{ secrets.EXADSBOT_TOKEN_ACTIONS }}
-          secrets_EXADSBOT_ACTIONS_SSH_KEY: ${{ secrets.EXADSBOT_ACTIONS_SSH_KEY }}
-          pull_request_head_ref: ${{ github.event.pull_request.head.ref }}
-
-      - name: Run test suite and get coverage report
-        run: |
-          cd repo
-          composer run-script --timeout=0 test:run:coverage -- --coverage-clover=../gh_reports/coverage/pr_report_clover.xml
-
-      - name: Create coverage report comment
-        uses: lucassabreu/comment-coverage-clover@v0.13.0
-        with:
-          with-chart: false
-          with-table: true
-          table-coverage-change: true
-          show-percentage-change-on-table: true
-          file: gh_reports/coverage/pr_report_clover.xml
-          base-file: gh_reports/coverage/master_report_clover.xml
+#      - name: Checkout gh-reports branch
+#        uses: actions/checkout@v4
+#        with:
+#          ref: gh-reports
+#          path: gh_reports
+#
+#      - name: Setup CI environment
+#        uses: ./repo/.github/actions/setup-environment
+#        with:
+#          root-dir: repo
+#          secrets_EXADSBOT_TOKEN_ACTIONS: ${{ secrets.EXADSBOT_TOKEN_ACTIONS }}
+#          secrets_EXADSBOT_ACTIONS_SSH_KEY: ${{ secrets.EXADSBOT_ACTIONS_SSH_KEY }}
+#          pull_request_head_ref: ${{ github.event.pull_request.head.ref }}
+#
+#      - name: Run test suite and get coverage report
+#        run: |
+#          cd repo
+#          composer run-script --timeout=0 test:run:coverage -- --coverage-clover=../gh_reports/coverage/pr_report_clover.xml
+#
+#      - name: Create coverage report comment
+#        uses: lucassabreu/comment-coverage-clover@v0.13.0
+#        with:
+#          with-chart: false
+#          with-table: true
+#          table-coverage-change: true
+#          show-percentage-change-on-table: true
+#          file: gh_reports/coverage/pr_report_clover.xml
+#          base-file: gh_reports/coverage/master_report_clover.xml
