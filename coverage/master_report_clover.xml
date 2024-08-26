@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<coverage generated="1724687649">
-  <project timestamp="1724687649">
+<coverage generated="1724687991">
+  <project timestamp="1724687991">
     <file name="/home/runner/work/gh_test/gh_test/repo/src/Exads/Repos/Repo.php">
       <class name="Exads\Repos\Repo" namespace="global">
         <metrics complexity="5" methods="5" coveredmethods="3" conditionals="0" coveredconditionals="0" statements="5" coveredstatements="3" elements="10" coveredelements="6"/>
