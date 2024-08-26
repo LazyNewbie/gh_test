@@ -26,9 +26,7 @@ jobs:
         uses: ./repo/.github/actions/setup-environment
         with:
           root-dir: repo
-          secrets_EXADSBOT_TOKEN_ACTIONS: ${{ secrets.EXADSBOT_TOKEN_ACTIONS }}
-          secrets_EXADSBOT_ACTIONS_SSH_KEY: ${{ secrets.EXADSBOT_ACTIONS_SSH_KEY }}
-          pull_request_head_ref: ${{ github.event.pull_request.head.ref }}
+          pull_request_head_ref: ${{ github.event.head.ref }}
 
       - name: Run test suite and save masters coverage report
         run: |

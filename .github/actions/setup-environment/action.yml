@@ -5,12 +5,6 @@ inputs:
   root-dir:
     description: "Current repository location"
     required: true
-  secrets_EXADSBOT_TOKEN_ACTIONS:
-    description: "secrets.EXADSBOT_TOKEN_ACTIONS"
-    required: true
-  secrets_EXADSBOT_ACTIONS_SSH_KEY:
-    description: "secrets.EXADSBOT_ACTIONS_SSH_KEY"
-    required: true
   pull_request_head_ref:
     description: "github.event.pull_request.head.ref"
     required: true
@@ -30,8 +24,6 @@ runs:
       shell: bash
       run: |
         echo "1: ${{ inputs.root-dir }}"
-        echo "2: ${{ inputs.secrets_EXADSBOT_TOKEN_ACTIONS }}"
-        echo "3: ${{ inputs.secrets_EXADSBOT_ACTIONS_SSH_KEY }}"
         echo "4: ${{ inputs.pull_request_head_ref }}"
 
 
