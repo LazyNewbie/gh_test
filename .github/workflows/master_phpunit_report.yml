@@ -16,11 +16,31 @@ jobs:
         with:
           php-version: '8.1'
 
+
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          path: repo
+
       - name: Run test suite and save masters coverage report
         run: |
           echo "${{ github.event.push.head_commit.message }}"
           echo "${{ github.event.pull_request.head_commit.message }}"
           echo "${{ github.event.workflow_run.head_commit.message }}"
+          echo "${{ env.commit-message }}"
+          echo "${{ env }}"
+
+#      - name: Commit new masters coverage report
+#        shell: bash
+#        run: |
+#          cd gh_reports
+#          git config user.name 'EXADS bot'
+#          git config user.email 'bot@exads.com'
+#          git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/$GITHUB_REPOSITORY
+#          git commit -am "report: ${{ github.event.head_commit.message }}"
+#          git push
+
+
 
 #      - name: Setup CI environment
 #        uses: ./repo/.github/actions/setup-environment
