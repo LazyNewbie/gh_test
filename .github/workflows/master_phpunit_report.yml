@@ -11,36 +11,34 @@ jobs:
     runs-on: ubuntu-latest
     steps:
 
-      - name: Checkout repository
-        uses: actions/checkout@v4
+      - name: Setup environment
+        uses: shivammathur/setup-php@v2
         with:
-          path: repo
-
-      - name: Checkout gh-reports branch
-        uses: actions/checkout@v4
-        with:
-          ref: gh-reports
-          path: gh_reports
-
-      - name: Setup CI environment
-        uses: ./repo/.github/actions/setup-environment
-        with:
-          root-dir: repo
-          pull_request_head_ref: ${{ github.event.head.ref }}
-          head_commit_message: ${{ github.event.workflow_run.head_commit.message }}
-          wfr: ${{ github }}
+          php-version: '8.1'
 
       - name: Run test suite and save masters coverage report
         run: |
-          cd repo
-          composer run-script --timeout=0 test:run:coverage -- --coverage-clover=../gh_reports/coverage/master_report_clover.xml
+          echo "${{ github.event.push.head_commit.message }}"
+          echo "${{ github.event.workflow_run.head_commit.message }}"
 
-      - name: Commit new masters coverage report
-        shell: bash
-        run: |
-          cd gh_reports
-          git config user.name 'EXADS bot'
-          git config user.email 'bot@exads.com'
-          git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/$GITHUB_REPOSITORY
-          git commit -am "report: ${{ github.event.head_commit.message }}"
-          git push
+#      - name: Setup CI environment
+#        uses: ./repo/.github/actions/setup-environment
+#        with:
+#          root-dir: repo
+#          pull_request_head_ref: ${{ github.event.push.head_commit.message }}
+#          head_commit_message: ${{ github.event.workflow_run.head_commit.message }}
+
+#      - name: Run test suite and save masters coverage report
+#        run: |
+#          cd repo
+#          composer run-script --timeout=0 test:run:coverage -- --coverage-clover=../gh_reports/coverage/master_report_clover.xml
+#
+#      - name: Commit new masters coverage report
+#        shell: bash
+#        run: |
+#          cd gh_reports
+#          git config user.name 'EXADS bot'
+#          git config user.email 'bot@exads.com'
+#          git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/$GITHUB_REPOSITORY
+#          git commit -am "report: ${{ github.event.head_commit.message }}"
+#          git push

@@ -11,9 +11,6 @@ inputs:
   head_commit_message:
     description: "github.event.workflow_run.head_commit.message"
     required: true
-  wfr:
-    description: "wfr"
-    required: true
 
 runs:
   using: "composite"
@@ -31,7 +28,6 @@ runs:
       run: |
         echo "1: ${{ inputs.root-dir }}"
         echo "2: ${{ inputs.head_commit_message }}"
-        echo "3: ${{ inputs.wfr }}"
         echo "4: ${{ inputs.pull_request_head_ref }}"
 
 
