@@ -27,6 +27,9 @@ jobs:
           cd repo
           echo "$(git log -1 --pretty=format:'%s')"
           echo "on force push"
+          
+
+
 #          echo "${{ github.event.push.head_commit.message }}"
 #          echo "${{ github.event.pull_request.head_commit.message }}"
 #          echo "${{ github.event.workflow_run.head_commit.message }}"
