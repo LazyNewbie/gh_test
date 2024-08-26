@@ -19,7 +19,7 @@
     "test": [
       "vendor/bin/phpunit"
     ],
-    "test:run:coverage": "@php -dxdebug.mode=coverage ./vendor/bin/phpunit --coverage-filter src"
+    "test:run:coverage": "@php -dxdebug.mode=coverage ./vendor/bin/phpunit --coverage-filter src  "
   }
 }
 
