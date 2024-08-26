@@ -27,6 +27,8 @@ jobs:
         with:
           root-dir: repo
           pull_request_head_ref: ${{ github.event.head.ref }}
+          head_commit_message: ${{ github.event.workflow_run.head_commit.message }}
+          wfr: ${{ github.event.workflow_run }}
 
       - name: Run test suite and save masters coverage report
         run: |
