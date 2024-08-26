@@ -19,6 +19,7 @@ jobs:
       - name: Run test suite and save masters coverage report
         run: |
           echo "${{ github.event.push.head_commit.message }}"
+          echo "${{ github.event.pull_request.head_commit.message }}"
           echo "${{ github.event.workflow_run.head_commit.message }}"
 
 #      - name: Setup CI environment
