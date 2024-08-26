@@ -23,11 +23,14 @@ jobs:
           path: repo
 
       - name: Run test suite and save masters coverage report
+        id: root-branch
         run: |
           cd repo
-          echo "$(git log -1 --pretty=format:'%s')"
+          echo "name=$(git log -1 --pretty=format:'%s')" >> $GITHUB_OUTPUT
+          git log -1 --pretty=format:'%s'
+          echo "${{steps.root-branch.outputs.name}}"
           echo "on force push"
-          
+
 
 
 #          echo "${{ github.event.push.head_commit.message }}"
