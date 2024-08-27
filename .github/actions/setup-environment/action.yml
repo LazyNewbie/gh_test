@@ -32,7 +32,6 @@ runs:
         echo "BRANCH_ENV=$(git branch --show-current)" >> $GITHUB_ENV
 
     - name: gh make dir branch
-      id: gh-branch
       shell: bash
       run: |
         mkdir ${{steps.gh-branch.outputs.branch}}
