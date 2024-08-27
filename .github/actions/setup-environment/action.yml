@@ -23,6 +23,29 @@ runs:
         ini-values: pcre.jit=0, log_errors=1
         extensions: memcached
 
+
+    - name: gh output
+      id: gh-out
+      shell: bash
+      run: |
+        echo "repo-dir=repo2" >> $GITHUB_OUTPUT
+        echo "REPO_DIR=repo2" >> $GITHUB_ENV
+        mkdir repo2
+        touch repo2/txt.txt
+
+    - name: gh test outputs
+      shell: bash
+      run: |
+        ls -lah ${{steps.gh-out.outputs.repo-dir}}
+
+
+    - name: gh test env
+      shell: bash
+      run: |
+        ls -lah ${{env.REPO_DIR}}
+
+
+
     - name: Show all values
       shell: bash
       run: |
