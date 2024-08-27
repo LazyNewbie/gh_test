@@ -4,7 +4,8 @@ on:
   push:
     branches: [ master ]
 
-
+env:
+  BRANCH_NAME: ${{ github.head_ref || github.ref_name }}
 
 jobs:
   make-test-report:
@@ -26,7 +27,7 @@ jobs:
         run: |
           cd repo
           echo "$(git log -1 --pretty=format:'%s')"
-          echo "on force push"
+          echo "BRANCH_NAME: $BRANCH_NAME"
 
       - name: Setup CI environment
         uses: ./repo/.github/actions/setup-environment
