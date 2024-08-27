@@ -27,8 +27,8 @@ runs:
     - id: gh-branch
       shell: bash
       run: |
-        echo "branch=$(git branch --show-current)" >> $GITHUB_OUTPUT
-        echo "BRANCH_ENV=$(git branch --show-current)" >> $GITHUB_ENV
+        echo "::set-output name=branch::$(git branch --show-current)"
+
 
     - name: gh make dir branch
       shell: bash
