@@ -24,8 +24,7 @@ runs:
         extensions: memcached
 
 
-    - name: gh get branch
-      id: gh-branch
+    - id: gh-branch
       shell: bash
       run: |
         echo "branch=$(git branch --show-current)" >> $GITHUB_OUTPUT
