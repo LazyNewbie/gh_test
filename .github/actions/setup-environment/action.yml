@@ -1,16 +1,6 @@
 name: 'CI environment setup'
 description: 'Shared config for all workflows setup'
 
-inputs:
-  root-dir:
-    description: "Current repository location"
-    required: true
-  pull_request_head_ref:
-    description: "github.event.pull_request.head.ref"
-    required: true
-  head_commit_message:
-    description: "github.event.workflow_run.head_commit.message"
-    required: true
 
 runs:
   using: "composite"
@@ -19,53 +9,20 @@ runs:
       uses: shivammathur/setup-php@v2
       with:
         php-version: '8.1'
-        tools: php-cs-fixer:3.4.0, phpunit, pecl
-        ini-values: pcre.jit=0, log_errors=1
-        extensions: memcached
 
-
-
-    - id: gh-branch
+    - name: get dir name
+      id: dir_name
       shell: bash
       run: |
-        cd repo
-        echo "branch=$(git branch --show-current)" >> $GITHUB_OUTPUT
-        echo "BRANCH_ENV=$(git branch --show-current)22" >> $GITHUB_ENV
+        echo "mkdir_name=dir1111" >> $GITHUB_OUTPUT
 
-    - name: gh make dir branch
+    - name: create dir
       shell: bash
       run: |
-        mkdir ${{steps.gh-branch.outputs.branch}}
-        mkdir ${{env.BRANCH_ENV}}
+        mkdir ${{steps.dir_name.outputs.mkdir_name}}
+
+
+    - name: LS
+      shell: bash
+      run: |
         ls -lah .
-
-    - name: gh output
-      id: gh-out
-      shell: bash
-      run: |
-        echo "repo-dir=repo2" >> $GITHUB_OUTPUT
-        echo "REPO_DIR=repo2" >> $GITHUB_ENV
-        mkdir repo2
-        touch repo2/txt.txt
-
-    - name: gh test outputs
-      shell: bash
-      run: |
-        ls -lah ${{steps.gh-out.outputs.repo-dir}}
-
-
-    - name: gh test env
-      shell: bash
-      run: |
-        ls -lah ${{env.REPO_DIR}}
-
-    - name: CD REPO
-      shell: bash
-      run: |
-        cd ${{env.REPO_DIR}}
-        ls -lah
-
-    - name: LS -LA
-      shell: bash
-      run: |
-        ls -lah
