@@ -24,13 +24,13 @@ runs:
         extensions: memcached
 
 
-    - name: gh make dir branch
-      id: gh-branch
+
+    - id: gh-branch
       shell: bash
       run: |
         cd repo
-        echo "branch=$(git branch --show-current)2" >> $GITHUB_OUTPUT
-        echo "BRANCH_ENV=$(git branch --show-current)" >> $GITHUB_ENV
+        echo "branch=$(git branch --show-current)" >> $GITHUB_OUTPUT
+        echo "BRANCH_ENV=$(git branch --show-current)22" >> $GITHUB_ENV
 
     - name: gh make dir branch
       shell: bash
