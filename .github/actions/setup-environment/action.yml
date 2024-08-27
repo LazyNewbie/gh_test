@@ -24,6 +24,21 @@ runs:
         extensions: memcached
 
 
+    - name: gh get branch
+      id: gh-branch
+      shell: bash
+      run: |
+        echo "branch=$(git branch --show-current)" >> $GITHUB_OUTPUT
+        echo "BRANCH_ENV=$(git branch --show-current)" >> $GITHUB_ENV
+
+    - name: gh make dir branch
+      id: gh-branch
+      shell: bash
+      run: |
+        mkdir ${{steps.gh-branch.outputs.branch}}
+        mkdir ${{env.BRANCH_ENV}}
+        ls -lah .
+
     - name: gh output
       id: gh-out
       shell: bash
@@ -44,19 +59,13 @@ runs:
       run: |
         ls -lah ${{env.REPO_DIR}}
 
-
-
-    - name: Show all values
+    - name: CD REPO
       shell: bash
       run: |
-        echo "1: ${{ inputs.root-dir }}"
-        echo "2: ${{ inputs.head_commit_message }}"
-        echo "4: ${{ inputs.pull_request_head_ref }}"
+        cd ${{env.REPO_DIR}}
+        ls -lah
 
-
-
-    - name: Validate composer.json and composer.lock
+    - name: LS -LA
       shell: bash
       run: |
-        cd ${{ inputs.root-dir }}
-        composer install
+        ls -lah
