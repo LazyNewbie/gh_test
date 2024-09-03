@@ -31,29 +31,30 @@ jobs:
 
       - name: Setup CI environment
         uses: ./repo/.github/actions/setup-environment
-      #        with:
+        with:
+          coverage_report_path: repo
       #          root-dir: repo
       #          secrets_EXADSBOT_TOKEN_ACTIONS: ${{ secrets.EXADSBOT_TOKEN_ACTIONS }}
       #          secrets_EXADSBOT_ACTIONS_SSH_KEY: ${{ secrets.EXADSBOT_ACTIONS_SSH_KEY }}
       #          pull_request_head_ref: ${{ github.event.pull_request.head.ref }}
 
-      - name: gh output
-        id: gh-out
-        shell: bash
-        run: |
-          echo "repo-dir=repo" >> $GITHUB_OUTPUT
-          echo "REPO_DIR=repo" >> $GITHUB_ENV
-
-      - name: gh test outputs
-        shell: bash
-        run: |
-          ls -lah ${{steps.gh-out.outputs.repo-dir}}
-
-
-      - name: gh test env
-        shell: bash
-        run: |
-          ls -lah ${{env.REPO_DIR}}
+#      - name: gh output
+#        id: gh-out
+#        shell: bash
+#        run: |
+#          echo "repo-dir=repo" >> $GITHUB_OUTPUT
+#          echo "REPO_DIR=repo" >> $GITHUB_ENV
+#
+#      - name: gh test outputs
+#        shell: bash
+#        run: |
+#          ls -lah ${{steps.gh-out.outputs.repo-dir}}
+#
+#
+#      - name: gh test env
+#        shell: bash
+#        run: |
+#          ls -lah ${{env.REPO_DIR}}
 
 
 #          echo "${{ github.event.push.head_commit.message }}"

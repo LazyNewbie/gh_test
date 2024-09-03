@@ -1,6 +1,11 @@
 name: 'CI environment setup'
 description: 'Shared config for all workflows setup'
 
+inputs:
+  coverage_report_path:
+    description: "Phpunit coverage report file path. If empty - code coverage will not be executed."
+    default: ""
+    required: false
 
 runs:
   using: "composite"
@@ -10,19 +15,34 @@ runs:
       with:
         php-version: '8.1'
 
-    - name: get dir name
-      id: dir_name
+
+    - name: When has report path
+      if: ${{ inputs.coverage_report_path != '' }}
       shell: bash
       run: |
-        echo "mkdir_name=dir1111" >> $GITHUB_OUTPUT
+        touch HAS_report_path.txt
+        ls -la .
 
-    - name: create dir
+    - name: When has no report path
+      if: ${{ inputs.coverage_report_path == '' }}
       shell: bash
       run: |
-        mkdir ${{steps.dir_name.outputs.mkdir_name}}
+        touch NO_report_path.txt
+        ls -la .
 
-
-    - name: LS
-      shell: bash
-      run: |
-        ls -lah .
+#    - name: get dir name
+#      id: dir_name
+#      shell: bash
+#      run: |
+#        echo "mkdir_name=dir1111" >> $GITHUB_OUTPUT
+#
+#    - name: create dir
+#      shell: bash
+#      run: |
+#        mkdir ${{steps.dir_name.outputs.mkdir_name}}
+#
+#
+#    - name: LS
+#      shell: bash
+#      run: |
+#        ls -lah .
