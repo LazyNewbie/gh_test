@@ -31,8 +31,8 @@ jobs:
 
       - name: Setup CI environment
         uses: ./repo/.github/actions/setup-environment
-      #        with:
-      #          coverage_report_path: repo
+        with:
+          coverage_report_path: ""
       #          root-dir: repo
       #          secrets_EXADSBOT_TOKEN_ACTIONS: ${{ secrets.EXADSBOT_TOKEN_ACTIONS }}
       #          secrets_EXADSBOT_ACTIONS_SSH_KEY: ${{ secrets.EXADSBOT_ACTIONS_SSH_KEY }}
