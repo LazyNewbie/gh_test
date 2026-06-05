@@ -33,6 +33,11 @@ jobs:
           secrets_EXADSBOT_ACTIONS_SSH_KEY: ${{ secrets.EXADSBOT_ACTIONS_SSH_KEY }}
           coverage_report_path: gh_reports/coverage/pr_report_clover.xml
 
+      - name: Install dependencies
+        run: |
+          cd repo
+          composer install --no-interaction --prefer-dist --optimize-autoloader --ignore-platform-reqs
+
       - name: Run test suite and get coverage report
         run: |
           cd repo
