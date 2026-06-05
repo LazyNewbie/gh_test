@@ -1,3 +1,4 @@
+
 name: EXADS Pipeline 1
 
 on:
@@ -17,11 +18,6 @@ jobs:
         with:
           path: repo
 
-      # - name: show env val
-      #   shell: bash
-      #   run: |
-      #     echo "BRANCH_NAME: $BRANCH_NAME"
-
       - name: Checkout gh-reports branch
         uses: actions/checkout@v4
         with:
@@ -37,10 +33,13 @@ jobs:
           secrets_EXADSBOT_ACTIONS_SSH_KEY: ${{ secrets.EXADSBOT_ACTIONS_SSH_KEY }}
           coverage_report_path: gh_reports/coverage/pr_report_clover.xml
 
-      # - name: Run test suite and get coverage report
-      #   run: |
-      #     cd repo
-      #     composer run-script --timeout=0 test:run:coverage -- --coverage-clover=../gh_reports/coverage/pr_report_clover.xml
+      - name: Run test suite and get coverage report
+        run: |
+          cd repo
+          composer run-script --timeout=0 test:run:coverage -- --coverage-clover=../gh_reports/coverage/pr_report_clover.xml
+
+      - name: Debug coverage artifacts
+        run: ls -la gh_reports/coverage/ || echo "dir missing"
 
       - name: Create coverage report comment
         uses: lucassabreu/comment-coverage-clover@v0.13.0
