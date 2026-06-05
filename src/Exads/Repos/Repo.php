@@ -17,6 +17,7 @@ class Repo
 
     public function getString3(): string
     {
+        // new commit
         return "string 3";
     }
 
