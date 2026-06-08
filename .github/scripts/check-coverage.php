@@ -27,14 +27,20 @@ function parseClover(string $path): array
     return $coverage;
 }
 
-function getOverallCoverage(string $cloverFile): float
+function getOverallCoverage(string $cloverFile): array
 {
-    $xml      = simplexml_load_file($cloverFile);
-    $metrics  = $xml->project->metrics;
-    $total    = (int) $metrics['statements'];
-    $covered  = (int) $metrics['coveredstatements'];
+    $xml     = simplexml_load_file($cloverFile);
+    $metrics = $xml->project->metrics;
 
-    return $total > 0 ? ($covered / $total) * 100 : 0.0;
+    $totalStmts     = (int) $metrics['statements'];
+    $coveredStmts   = (int) $metrics['coveredstatements'];
+    $totalMethods   = (int) $metrics['methods'];
+    $coveredMethods = (int) $metrics['coveredmethods'];
+
+    return [
+        'line'   => $totalStmts > 0 ? ($coveredStmts / $totalStmts) * 100 : 0.0,
+        'method' => $totalMethods > 0 ? ($coveredMethods / $totalMethods) * 100 : 0.0,
+    ];
 }
 
 function getAddedLines(string $baseBranch): array
@@ -154,22 +160,22 @@ foreach ($addedLines as $relPath => $lineNums) {
     }
 }
 
-$delta         = $overallCoverage - $masterCoverage;
-$deltaStr      = sprintf('%+.2f%%', $delta);
-$overallPassed = $overallCoverage >= $masterCoverage;
+$lineDelta     = $overallCoverage['line'] - $masterCoverage['line'];
+$methodDelta   = $overallCoverage['method'] - $masterCoverage['method'];
+$overallPassed = $overallCoverage['line'] >= $masterCoverage['line'] && $overallCoverage['method'] >= $masterCoverage['method'];
 
-printf("Overall coverage: %.2f%%\n", $overallCoverage);
-printf("Master coverage:  %.2f%%\n", $masterCoverage);
-printf("Delta: %s\n", $deltaStr);
+printf("Overall line coverage:   %.2f%%\n", $overallCoverage['line']);
+printf("Overall method coverage: %.2f%%\n", $overallCoverage['method']);
+printf("Master line coverage:    %.2f%%\n", $masterCoverage['line']);
+printf("Master method coverage:  %.2f%%\n", $masterCoverage['method']);
 
 $rows = [
     '## Coverage Report',
     '',
-    '| Metric | Value |',
-    '| --- | --- |',
-    sprintf('| Overall coverage | %.2f%% |', $overallCoverage),
-    sprintf('| Master coverage | %.2f%% |', $masterCoverage),
-    sprintf('| Change vs master | %s |', $deltaStr),
+    '| Metric | PR | Master | Change |',
+    '| --- | --- | --- | --- |',
+    sprintf('| Line coverage | %.2f%% | %.2f%% | %+.2f%% |', $overallCoverage['line'], $masterCoverage['line'], $lineDelta),
+    sprintf('| Method coverage | %.2f%% | %.2f%% | %+.2f%% |', $overallCoverage['method'], $masterCoverage['method'], $methodDelta),
 ];
 
 if ($totalExecutable === 0) {
@@ -180,12 +186,12 @@ if ($totalExecutable === 0) {
     $rows[] = '';
     $rows[] = $overallPassed
         ? ':white_check_mark: Overall coverage has not decreased.'
-        : sprintf(':x: **FAIL**: Overall coverage decreased by %.2f%%', abs($delta));
+        : sprintf(':x: **FAIL**: Overall coverage decreased (line: %+.2f%%, method: %+.2f%%)', $lineDelta, $methodDelta);
 
     postPrComment(implode("\n", $rows));
 
     if (!$overallPassed) {
-        printf("\nFAIL: Overall coverage decreased by %.2f%%\n", abs($delta));
+        printf("\nFAIL: Overall coverage decreased\n");
         printf("Peak memory: %.2f MB\n", memory_get_peak_usage(true) / 1024 / 1024);
         exit(1);
     }
@@ -207,14 +213,14 @@ if (!empty($uncoveredFiles)) {
     }
 }
 
-$rows[] = sprintf('| PR patch coverage | %.2f%% (%d/%d statements) |', $patchCoverage, $coveredAdded, $totalExecutable);
+$rows[] = sprintf('| PR patch coverage | %.2f%% (%d/%d statements) | — | — |', $patchCoverage, $coveredAdded, $totalExecutable);
 $rows[] = '';
 
 if (!$patchPassed) {
     $rows[] = sprintf(':x: **FAIL**: Patch coverage %.2f%% is below minimum %.2f%%', $patchCoverage, $minPatchCoverage);
 }
 if (!$overallPassed) {
-    $rows[] = sprintf(':x: **FAIL**: Overall coverage decreased by %.2f%%', abs($delta));
+    $rows[] = sprintf(':x: **FAIL**: Overall coverage decreased (line: %+.2f%%, method: %+.2f%%)', $lineDelta, $methodDelta);
 }
 if ($passed) {
     $rows[] = sprintf(':white_check_mark: **PASS**: Patch coverage %.2f%% meets minimum %.2f%%', $patchCoverage, $minPatchCoverage);
