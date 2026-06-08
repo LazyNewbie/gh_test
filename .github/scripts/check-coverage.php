@@ -1,14 +1,15 @@
 <?php
-
 declare(strict_types=1);
 
+const COMMENT_MARKER = '<!-- pr-coverage-report -->';
 
 $minPatchCoverage = (float) ($argv[1] ?? throw new \Exception("[arg 1] Minimum PR coverage not provided."));    // percentage 50, 80, 100
-$cloverFile       = $argv[2] ?? throw new \Exception("[arg 2] clover.xml path not provided.");                  // clover.xml relative file path
+$prCloverFile       = $argv[2] ?? throw new \Exception("[arg 2] clover.xml path not provided.");                // Current PR clover.xml relative file path
 $masterCloverFile = $argv[3] ?? throw new \Exception("[arg 3] master clover.xml path not provided.");           // master branch clover.xml relative file path
 $baseBranch       = $argv[4] ?? throw new \Exception("[arg 4] base branch not provided.");                      // usualy origin/master
 
 
+// returns ['file_name' => [line_num => bool_covered]]
 function parseClover(string $path): array
 {
     $xml      = simplexml_load_file($path);
@@ -17,11 +18,11 @@ function parseClover(string $path): array
     foreach ($xml->project->file as $file) {
         $lines = [];
         foreach ($file->line as $line) {
-            if ((string) $line['type'] === 'stmt') {
-                $lines[(int) $line['num']] = (int) $line['count'] > 0;
+            if ((string)$line['type'] === 'stmt') {
+                $lines[(int)$line['num']] = (int)$line['count'] > 0;
             }
         }
-        $coverage[(string) $file['name']] = $lines;
+        $coverage[(string)$file['name']] = $lines;
     }
 
     return $coverage;
@@ -32,10 +33,10 @@ function getOverallCoverage(string $cloverFile): array
     $xml     = simplexml_load_file($cloverFile);
     $metrics = $xml->project->metrics;
 
-    $totalStmts     = (int) $metrics['statements'];
-    $coveredStmts   = (int) $metrics['coveredstatements'];
-    $totalMethods   = (int) $metrics['methods'];
-    $coveredMethods = (int) $metrics['coveredmethods'];
+    $totalStmts     = (int)$metrics['statements'];
+    $coveredStmts   = (int)$metrics['coveredstatements'];
+    $totalMethods   = (int)$metrics['methods'];
+    $coveredMethods = (int)$metrics['coveredmethods'];
 
     return [
         'line'   => $totalStmts > 0 ? ($coveredStmts / $totalStmts) * 100 : 0.0,
@@ -43,6 +44,7 @@ function getOverallCoverage(string $cloverFile): array
     ];
 }
 
+// how many lines were added in this PR
 function getAddedLines(string $baseBranch): array
 {
     exec(
@@ -54,14 +56,14 @@ function getAddedLines(string $baseBranch): array
     $addedLines  = [];
     $currentFile = null;
     $currentLine = 0;
-
+var_dump($output);
     foreach ($output as $line) {
         if (str_starts_with($line, '+++ b/')) {
             $currentFile              = substr($line, 6);
             $addedLines[$currentFile] ??= [];
         } elseif (str_starts_with($line, '@@ ')) {
             preg_match('/@@ -\S+ \+(\d+)/', $line, $m);
-            $currentLine = (int) $m[1];
+            $currentLine = (int)$m[1];
         } elseif ($currentFile !== null && str_starts_with($line, '+')) {
             $addedLines[$currentFile][] = $currentLine++;
         } elseif ($currentFile !== null && !str_starts_with($line, '-')) {
@@ -72,8 +74,7 @@ function getAddedLines(string $baseBranch): array
     return $addedLines;
 }
 
-const COMMENT_MARKER = '<!-- patch-coverage-report -->';
-
+// find PR comment by COMMENT_MARKER
 function findExistingCommentId(string $prNum, string $repo): ?int
 {
     exec(sprintf(
@@ -90,13 +91,14 @@ function findExistingCommentId(string $prNum, string $repo): ?int
 
     foreach ($comments as $comment) {
         if (str_contains($comment['body'], COMMENT_MARKER)) {
-            return (int) $comment['id'];
+            return (int)$comment['id'];
         }
     }
 
     return null;
 }
 
+// add(update if exists) comment to PR conversation
 function postPrComment(string $body): void
 {
     $prNum = getenv('PR_NUMBER') ?: throw new \Exception("PR_NUMBER env variable not set.");
@@ -112,7 +114,7 @@ function postPrComment(string $body): void
         exec(sprintf(
             'gh api --method PATCH repos/%s/issues/comments/%s -f body=%s',
             escapeshellarg($repo),
-            escapeshellarg((string) $existingId),
+            escapeshellarg((string)$existingId),
             escapeshellarg($body)
         ), $out, $exitCode);
     } else {
@@ -128,10 +130,10 @@ function postPrComment(string $body): void
     }
 }
 
-$cloverCoverage  = parseClover($cloverFile);
+$cloverCoverage  = parseClover($prCloverFile);
 $addedLines      = getAddedLines($baseBranch);
-$repoRoot        = rtrim((string) shell_exec('git rev-parse --show-toplevel'), "\n");
-$overallCoverage = getOverallCoverage($cloverFile);
+$repoRoot        = rtrim((string)shell_exec('git rev-parse --show-toplevel'), "\n");
+$overallCoverage = getOverallCoverage($prCloverFile);
 $masterCoverage  = getOverallCoverage($masterCloverFile);
 
 $totalExecutable = 0;
@@ -185,7 +187,7 @@ if ($totalExecutable === 0) {
     $rows[] = 'No new executable statements — patch coverage check skipped.';
     $rows[] = '';
     $rows[] = $overallPassed
-        ? ':white_check_mark: Overall coverage has not decreased.'
+        ? ':white_check_mark: Coverage check passed.'
         : sprintf(':x: **FAIL**: Overall coverage decreased (line: %+.2f%%, method: %+.2f%%)', $lineDelta, $methodDelta);
 
     postPrComment(implode("\n", $rows));
