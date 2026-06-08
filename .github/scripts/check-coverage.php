@@ -47,6 +47,7 @@ function getOverallCoverage(string $cloverFile): array
 // how many lines were added in this PR
 function getAddedLines(string $baseBranch): array
 {
+    $cmd = sprintf('git diff %s...HEAD --unified=0 --diff-filter=ACM -- "*.php" 2>&1', escapeshellarg($baseBranch));
     exec(
         sprintf('git diff %s...HEAD --unified=0 --diff-filter=ACM -- "*.php" 2>&1', escapeshellarg($baseBranch)),
         $output,
@@ -56,6 +57,7 @@ function getAddedLines(string $baseBranch): array
     $addedLines  = [];
     $currentFile = null;
     $currentLine = 0;
+var_dump($cmd);
 var_dump($output);
     foreach ($output as $line) {
         if (str_starts_with($line, '+++ b/')) {
