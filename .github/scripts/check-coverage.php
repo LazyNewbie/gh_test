@@ -66,13 +66,56 @@ function getAddedLines(string $baseBranch): array
     return $addedLines;
 }
 
+const COMMENT_MARKER = '<!-- patch-coverage-report -->';
+
+function findExistingCommentId(string $prNum, string $repo): ?int
+{
+    exec(sprintf(
+        'gh api repos/%s/issues/%s/comments --paginate',
+        escapeshellarg($repo),
+        escapeshellarg($prNum)
+    ), $out, $exitCode);
+
+    if ($exitCode !== 0) {
+        return null;
+    }
+
+    $comments = json_decode(implode('', $out), true) ?? [];
+
+    foreach ($comments as $comment) {
+        if (str_contains($comment['body'], COMMENT_MARKER)) {
+            return (int) $comment['id'];
+        }
+    }
+
+    return null;
+}
+
 function postPrComment(string $body): void
 {
     $prNum = getenv('PR_NUMBER') ?: throw new \Exception("PR_NUMBER env variable not set.");
+    $repo  = getenv('GITHUB_REPOSITORY') ?: throw new \Exception("GITHUB_REPOSITORY env variable not set.");
+
+    $body = COMMENT_MARKER . "\n" . $body;
 
     echo "Posting PR comment:\n$body\n";
 
-    exec(sprintf('gh pr comment %s --body %s', escapeshellarg($prNum), escapeshellarg($body)), $out, $exitCode);
+    $existingId = findExistingCommentId($prNum, $repo);
+
+    if ($existingId !== null) {
+        exec(sprintf(
+            'gh api --method PATCH repos/%s/issues/comments/%s -f body=%s',
+            escapeshellarg($repo),
+            escapeshellarg((string) $existingId),
+            escapeshellarg($body)
+        ), $out, $exitCode);
+    } else {
+        exec(sprintf(
+            'gh pr comment %s --body %s',
+            escapeshellarg($prNum),
+            escapeshellarg($body)
+        ), $out, $exitCode);
+    }
 
     if ($exitCode !== 0) {
         throw new \Exception("gh pr comment failed: " . implode("\n", $out));
