@@ -172,7 +172,7 @@ printf("Master method coverage:  %.2f%%\n", $masterCoverage['method']);
 $rows = [
     '## Coverage Report',
     '',
-    '| Metric | PR | Master | Change |',
+    '| Metric | PR | Master | Master Change |',
     '| --- | --- | --- | --- |',
     sprintf('| Line coverage | %.2f%% | %.2f%% | %+.2f%% |', $overallCoverage['line'], $masterCoverage['line'], $lineDelta),
     sprintf('| Method coverage | %.2f%% | %.2f%% | %+.2f%% |', $overallCoverage['method'], $masterCoverage['method'], $methodDelta),
