@@ -46,14 +46,28 @@ jobs:
       - name: Debug coverage artifacts
         run: ls -la gh_reports/coverage/ || echo "dir missing"
 
-      - name: Create coverage report comment
-        uses: lucassabreu/comment-coverage-clover@v0.13.0
-        with:
-          with-chart: false
-          with-table: true
-          only-with-cover: true
-          show-percentage-change-on-table: true
-          with-branches: false
-          file: gh_reports/coverage/pr_report_clover.xml
-          base-file: gh_reports/coverage/master_report_clover.xml
-          max-line-coverage-decrease: "0.1"
+      # - name: Create coverage report comment
+      #   uses: lucassabreu/comment-coverage-clover@v0.13.0
+      #   with:
+      #     with-chart: false
+      #     with-table: true
+      #     only-with-cover: true
+      #     show-percentage-change-on-table: true
+      #     with-branches: false
+      #     file: gh_reports/coverage/pr_report_clover.xml
+      #     base-file: gh_reports/coverage/master_report_clover.xml
+      #     max-line-coverage-decrease: "0.1"
+
+
+
+      # Min PR code coverage = 80%
+      - name: Check patch coverage
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        run: |
+          cd repo && php .github/scripts/check-coverage.php \
+          80 \
+          ../gh_reports/coverage/pr_report_clover.xml \
+          ../gh_reports/coverage/master_report_clover.xml \
+          origin/master
