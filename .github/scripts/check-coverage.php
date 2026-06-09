@@ -183,6 +183,30 @@ function postPrComment(string $body): void
     }
 }
 
+/**
+ * Build the markdown "Changed files" table: every changed file with its patch coverage.
+ * Files with no clover-tracked executable lines (pure comments/whitespace, or absent from
+ * the coverage report) show as n/a.
+ *
+ * @param array<string, int[]>                       $addedLines   per-file added line numbers
+ * @param array<string, array{covered:int,total:int}> $perFileStats per-file covered/total tally
+ * @return string[] markdown rows
+ */
+function buildChangedFilesTable(array $addedLines, array $perFileStats): array
+{
+    $rows = ['### Changed files', '', '| File | Patch coverage |', '| --- | --- |'];
+
+    foreach (array_keys($addedLines) as $file) {
+        $stats = $perFileStats[$file] ?? null;
+
+        $rows[] = $stats === null
+            ? sprintf('| `%s` | n/a |', $file)
+            : sprintf('| `%s` | %.2f%% (%d/%d) |', $file, ($stats['covered'] / $stats['total']) * 100, $stats['covered'], $stats['total']);
+    }
+
+    return $rows;
+}
+
 
 
 
@@ -196,9 +220,10 @@ $commitHash      = rtrim((string)shell_exec('git rev-parse HEAD'), "\n");
 $overallCoverage = getOverallCoverage($prCloverFile);
 $masterCoverage  = getOverallCoverage($masterCloverFile);
 
-$totalExecutable = 0;
-$coveredAdded    = 0;
+$totalExecutable = 0;   // new executable lines added by this PR (tracked by clover)
+$coveredAdded    = 0;   // of those, how many are covered by tests
 $uncoveredFiles  = [];
+$perFileStats    = [];  // relPath => ['covered' => int, 'total' => int] — per-file patch coverage
 
 foreach ($addedLines as $relPath => $lineNums) {
     // git reports repo-relative paths, clover stores absolute ones — bridge with the repo root.
@@ -215,9 +240,12 @@ foreach ($addedLines as $relPath => $lineNums) {
         }
 
         $totalExecutable++;
+        $perFileStats[$relPath]['total']   = ($perFileStats[$relPath]['total'] ?? 0) + 1;
+        $perFileStats[$relPath]['covered'] ??= 0;
 
         if ($fileCoverage[$lineNum]) {
             $coveredAdded++;
+            $perFileStats[$relPath]['covered']++;
         } else {
             $uncoveredFiles[$relPath][] = $lineNum;
         }
@@ -251,6 +279,8 @@ if ($totalExecutable === 0) {
     $rows[] = '';
     $rows[] = 'No new executable statements — patch coverage check skipped.';
     $rows[] = '';
+    $rows   = array_merge($rows, buildChangedFilesTable($addedLines, $perFileStats));
+    $rows[] = '';
     $rows[] = ':white_check_mark: Coverage check passed.';
 
     postPrComment(implode("\n", $rows));
@@ -273,6 +303,9 @@ if (!empty($uncoveredFiles)) {
 }
 
 $rows[] = sprintf('| PR patch coverage | %.2f%% (%d/%d statements) | — | — |', $patchCoverage, $coveredAdded, $totalExecutable);
+
+$rows[] = '';
+$rows   = array_merge($rows, buildChangedFilesTable($addedLines, $perFileStats));
 $rows[] = '';
 
 if ($passed) {
