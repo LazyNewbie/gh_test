@@ -53,20 +53,6 @@ jobs:
         run: |
           cd repo && php .github/scripts/report-phpunit-failure.php
 
-      
-      # - name: Create coverage report comment
-      #   uses: lucassabreu/comment-coverage-clover@v0.13.0
-      #   with:
-      #     with-chart: false
-      #     with-table: true
-      #     only-with-cover: true
-      #     show-percentage-change-on-table: true
-      #     with-branches: false
-      #     file: gh_reports/coverage/pr_report_clover.xml
-      #     base-file: gh_reports/coverage/master_report_clover.xml
-      #     max-line-coverage-decrease: "0.1"
-
-
 
       # Min PR code coverage = 80%
       - name: Check patch coverage

@@ -205,8 +205,8 @@ $rows = [
     '',
     '| Metric | PR | Master | Master Change |',
     '| --- | --- | --- | --- |',
-    sprintf('| Line coverage | %.2f%% | %.2f%% | %+.2f%% |', $overallCoverage['line'], $masterCoverage['line'], $lineDelta),
-    sprintf('| Method coverage | %.2f%% | %.2f%% | %+.2f%% |', $overallCoverage['method'], $masterCoverage['method'], $methodDelta),
+    sprintf('| Line coverage | %.4f%% | %.4f%% | %+.4f%% |', $overallCoverage['line'], $masterCoverage['line'], $lineDelta),
+    sprintf('| Method coverage | %.4f%% | %.4f%% | %+.4f%% |', $overallCoverage['method'], $masterCoverage['method'], $methodDelta),
 ];
 
 // No new executable lines (docs/test-only/refactor PRs): nothing to gate — pass.
