@@ -78,4 +78,4 @@ jobs:
           80 \
           ../gh_reports/coverage/pr_report_clover.xml \
           ../gh_reports/coverage/master_report_clover.xml \
-          ${{ github.base_ref }}
+          "origin/${{ github.base_ref }}"
