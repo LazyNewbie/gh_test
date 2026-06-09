@@ -40,13 +40,20 @@ jobs:
           composer install --no-interaction --prefer-dist --optimize-autoloader --ignore-platform-reqs
 
       - name: Run test suite and get coverage report
+        id: run_tests
         run: |
           cd repo
           composer run-script --timeout=0 test:run:coverage -- --coverage-clover=../gh_reports/coverage/pr_report_clover.xml
 
-      - name: Debug coverage artifacts
-        run: ls -la gh_reports/coverage/ || echo "dir missing"
+      - name: Report phpunit failure
+        if: failure() && steps.run_tests.outcome == 'failure'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        run: |
+          cd repo && php .github/scripts/report-phpunit-failure.php
 
+      
       # - name: Create coverage report comment
       #   uses: lucassabreu/comment-coverage-clover@v0.13.0
       #   with:
