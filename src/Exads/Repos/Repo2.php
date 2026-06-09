@@ -27,6 +27,6 @@ class Repo2
         if($x==2){
             return "string 4.1";    
         }
-        return "string 1";
+        return "string 4";
     }
 }

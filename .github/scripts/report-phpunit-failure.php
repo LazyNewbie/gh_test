@@ -21,7 +21,7 @@ $body = implode("\n", [
     '',
     '## Coverage Report',
     '',
-    ':x: phpunit execution **FAIL**',
+    'phpunit execution :x:**FAIL**',
 ]);
 
 postPrComment($body);

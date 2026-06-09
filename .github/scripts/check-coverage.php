@@ -245,9 +245,9 @@ $rows[] = buildChangedFilesTable($perFileStats);
 $rows[] = '';
 
 if ($passed) {
-    $rows[] = sprintf(':white_check_mark: **PASS**: Patch coverage %.2f%% meets minimum %.2f%%', $patchCoverage, $minPatchCoverage);
+    $rows[] = sprintf(':white_check_mark:**PASS**: Patch coverage %.2f%% meets minimum %.2f%%', $patchCoverage, $minPatchCoverage);
 } else {
-    $rows[] = sprintf(':x: **FAIL**: Patch coverage %.2f%% is below minimum %.2f%%', $patchCoverage, $minPatchCoverage);
+    $rows[] = sprintf(':x:**FAIL**: Patch coverage %.2f%% is below minimum %.2f%%', $patchCoverage, $minPatchCoverage);
 }
 
 postPrComment(implode("\n", $rows));
