@@ -184,23 +184,19 @@ function postPrComment(string $body): void
 }
 
 /**
- * Build the markdown "Changed files" table: every changed file with its patch coverage.
- * Files with no clover-tracked executable lines (pure comments/whitespace, or absent from
- * the coverage report) show as n/a.
+ * Build the "Changed files" table: each clover-tracked changed file with its patch coverage.
+ * Files with no tracked executable lines (pure comments/whitespace, or absent from the
+ * coverage report) are omitted.
  *
- * @param array<string, int[]>                       $addedLines   per-file added line numbers
  * @param array<string, array{covered:int,total:int}> $perFileStats per-file covered/total tally
  */
-function buildChangedFilesTable(array $addedLines, array $perFileStats): string
+function buildChangedFilesTable(array $perFileStats): string
 {
     $table = "<details>\n<summary>Changed files</summary>\n\n<table>\n"
         . "<thead><tr><th>File</th><th>Patch coverage</th></tr></thead>\n<tbody>\n";
 
-    foreach (array_keys($addedLines) as $file) {
-        $stats    = $perFileStats[$file] ?? null;
-        $coverage = $stats === null
-            ? 'n/a'
-            : sprintf('%.2f%% (%d/%d)', ($stats['covered'] / $stats['total']) * 100, $stats['covered'], $stats['total']);
+    foreach ($perFileStats as $file => $stats) {
+        $coverage = sprintf('%.2f%% (%d/%d)', ($stats['covered'] / $stats['total']) * 100, $stats['covered'], $stats['total']);
 
         $table .= sprintf("<tr><td><code>%s</code></td><td>%s</td></tr>\n", htmlspecialchars($file, ENT_QUOTES), $coverage);
     }
@@ -280,7 +276,7 @@ if ($totalExecutable === 0) {
     $rows[] = '';
     $rows[] = 'No new executable statements — patch coverage check skipped.';
     $rows[] = '';
-    $rows[] = buildChangedFilesTable($addedLines, $perFileStats);
+    $rows[] = buildChangedFilesTable($perFileStats);
     $rows[] = '';
     $rows[] = ':white_check_mark: Coverage check passed.';
 
@@ -306,7 +302,7 @@ if (!empty($uncoveredFiles)) {
 $rows[] = sprintf('| PR patch coverage | %.2f%% (%d/%d statements) | — | — |', $patchCoverage, $coveredAdded, $totalExecutable);
 
 $rows[] = '';
-$rows[] = buildChangedFilesTable($addedLines, $perFileStats);
+$rows[] = buildChangedFilesTable($perFileStats);
 $rows[] = '';
 
 if ($passed) {
