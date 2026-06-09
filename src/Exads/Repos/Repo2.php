@@ -22,8 +22,11 @@ class Repo2
     }
 
 
-    public function getString4(): string
+    public function getString4($x=1): string
     {
+        if($x==2){
+            return "string 4.1";    
+        }
         return "string 4";
     }
 }

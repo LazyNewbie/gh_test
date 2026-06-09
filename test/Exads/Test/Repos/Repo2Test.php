@@ -39,9 +39,9 @@ class Repo2Test extends TestCase
     /**
      * @test
      */
-    // public function getString4MustReturnString(): void
-    // {
-    //     $r = new Repo2();
-    //     $this->assertEquals("string 4", $r->getString4());
-    // }
+    public function getString4MustReturnString(): void
+    {
+        $r = new Repo2();
+        $this->assertEquals("string 4", $r->getString4());
+    }
 }
