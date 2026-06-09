@@ -192,6 +192,7 @@ foreach ($addedLines as $relPath => $lineNums) {
 $lineDelta   = $overallCoverage['line'] - $masterCoverage['line'];
 $methodDelta = $overallCoverage['method'] - $masterCoverage['method'];
 
+printf("Base branch:             %s\n",     $baseBranch);
 printf("Overall line coverage:   %.2f%%\n", $overallCoverage['line']);
 printf("Overall method coverage: %.2f%%\n", $overallCoverage['method']);
 printf("Master line coverage:    %.2f%%\n", $masterCoverage['line']);
