@@ -22,8 +22,8 @@ class Repo2
     }
 
 
-    // public function getString4(): string
-    // {
-    //     return "string 4";
-    // }
+    public function getString4(): string
+    {
+        return "string 4";
+    }
 }
