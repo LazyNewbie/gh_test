@@ -1,15 +1,47 @@
 <?php
 declare(strict_types=1);
 
-const COMMENT_MARKER = '<!-- pr-coverage-report -->';
+/**
+ * CI gate for PR patch test coverage.
+ *
+ * Gates solely on patch coverage — the share of newly added lines that are tested.
+ * Exits 1 when patch coverage is below <minPatchCoverage>, 0 otherwise.
+ * Overall PR and master figures are also computed
+ * but only for the report comment — they never affect the exit code.
+ *
+ * 
+ * Why only the PR's new lines, not overall coverage?
+ *   - It is the author's responsibility: the gate only blocks on code this PR added,
+ *     which the author can act on, instead of failing them for pre-existing untested
+ *     code they never touched.
+ *   - It avoids flaky, un-actionable failures from global-percentage drift (denominator
+ *     shifts, generated code, unrelated files) that have nothing to do with the current PR change.
+ *   - It steadily raises coverage: every new line must clear the bar, so the codebase
+ *     improves over time without demanding a big-bang backfill of legacy tests.
+ *
+ * 
+ * Usage: php check-coverage.php <minPatchCoverage> <prClover> <masterClover> <baseBranch>
+ * Env:   PR_NUMBER, GITHUB_REPOSITORY (required by postPrComment for the gh API calls).
+ */
 
-$minPatchCoverage = (float) ($argv[1] ?? throw new \Exception("[arg 1] Minimum PR coverage not provided."));    // percentage 50, 80, 100
+
+
+$minPatchCoverage = (float) ($argv[1] ?? throw new \Exception("[arg 1] Minimum PR coverage not provided."));    // percentage 1..100
 $prCloverFile       = $argv[2] ?? throw new \Exception("[arg 2] clover.xml path not provided.");                // Current PR clover.xml relative file path
 $masterCloverFile = $argv[3] ?? throw new \Exception("[arg 3] master clover.xml path not provided.");           // master branch clover.xml relative file path
 $baseBranch       = $argv[4] ?? throw new \Exception("[arg 4] base branch not provided.");                      // usualy origin/master
 
 
-// returns ['file_name' => [line_num => bool_covered]]
+
+/**
+ * Build per-line coverage from a clover report.
+ *
+ * Only `stmt` lines are tracked (method/cond entries are ignored) so the result
+ * lines up with the executable lines git reports as added. File names are clover's
+ * absolute paths.
+ *
+ * @return array<string, array<int, bool>> ['/abs/file.php' => [lineNum => isCovered]]
+ */
 function parseClover(string $path): array
 {
     $xml      = simplexml_load_file($path);
@@ -28,6 +60,11 @@ function parseClover(string $path): array
     return $coverage;
 }
 
+/**
+ * Read the aggregate <metrics> element from a clover report.
+ *
+ * @return array{line: float, method: float} coverage percentages (0.0 when no statements/methods)
+ */
 function getOverallCoverage(string $cloverFile): array
 {
     $xml     = simplexml_load_file($cloverFile);
@@ -44,31 +81,40 @@ function getOverallCoverage(string $cloverFile): array
     ];
 }
 
-// how many lines were added in this PR
+/**
+ * Collect the line numbers added by this PR, per file.
+ *
+ * @return array<string, int[]> ['repo/relative/path.php' => [lineNum, ...]]
+ */
 function getAddedLines(string $baseBranch): array
 {
-    $cmd = sprintf('git diff %s...HEAD --unified=0 --diff-filter=ACM -- "*.php" 2>&1', escapeshellarg($baseBranch));
+    // `--unified=0` drops context lines so every `+` is a genuine addition;
+    // `--diff-filter=ACM` limits to added/copied/modified files.
     exec(
         sprintf('git diff %s...HEAD --unified=0 --diff-filter=ACM -- "*.php" 2>&1', escapeshellarg($baseBranch)),
         $output,
         $exitCode
     );
 
+    // Walk the diff as a small state machine.
     $addedLines  = [];
     $currentFile = null;
     $currentLine = 0;
-var_dump($cmd);
-var_dump($output);
+
     foreach ($output as $line) {
         if (str_starts_with($line, '+++ b/')) {
+            // `+++ b/` sets the current file.
             $currentFile              = substr($line, 6);
             $addedLines[$currentFile] ??= [];
         } elseif (str_starts_with($line, '@@ ')) {
+            // `@@` resets the line counter to the hunk's new-side start.
             preg_match('/@@ -\S+ \+(\d+)/', $line, $m);
             $currentLine = (int)$m[1];
         } elseif ($currentFile !== null && str_starts_with($line, '+')) {
+            // Only `+` lines are recorded as added.
             $addedLines[$currentFile][] = $currentLine++;
         } elseif ($currentFile !== null && !str_starts_with($line, '-')) {
+            // Any other non-removal line just advances the counter.
             $currentLine++;
         }
     }
@@ -76,7 +122,11 @@ var_dump($output);
     return $addedLines;
 }
 
-// find PR comment by COMMENT_MARKER
+/**
+ * Find this script's previously posted report comment, identified by COMMENT_MARKER.
+ *
+ * @return int|null the comment id, or null if none exists / the gh lookup failed
+ */
 function findExistingCommentId(string $prNum, string $repo): ?int
 {
     exec(sprintf(
@@ -100,7 +150,10 @@ function findExistingCommentId(string $prNum, string $repo): ?int
     return null;
 }
 
-// add(update if exists) comment to PR conversation
+/**
+ * Upsert the coverage report comment: PATCH the existing marked comment if one is
+ * found, otherwise create a new one. Throws if the gh call fails.
+ */
 function postPrComment(string $body): void
 {
     $prNum = getenv('PR_NUMBER') ?: throw new \Exception("PR_NUMBER env variable not set.");
@@ -132,6 +185,12 @@ function postPrComment(string $body): void
     }
 }
 
+
+
+
+const COMMENT_MARKER = '<!-- pr-coverage-report -->';
+
+
 $cloverCoverage  = parseClover($prCloverFile);
 $addedLines      = getAddedLines($baseBranch);
 $repoRoot        = rtrim((string)shell_exec('git rev-parse --show-toplevel'), "\n");
@@ -143,6 +202,7 @@ $coveredAdded    = 0;
 $uncoveredFiles  = [];
 
 foreach ($addedLines as $relPath => $lineNums) {
+    // git reports repo-relative paths, clover stores absolute ones — bridge with the repo root.
     $fileCoverage = $cloverCoverage[$repoRoot . '/' . $relPath] ?? null;
 
     if ($fileCoverage === null) {
@@ -150,6 +210,7 @@ foreach ($addedLines as $relPath => $lineNums) {
     }
 
     foreach ($lineNums as $lineNum) {
+        // Added lines absent from coverage are non-executable (comments, blanks, braces) — ignore them.
         if (!isset($fileCoverage[$lineNum])) {
             continue;
         }
@@ -164,9 +225,9 @@ foreach ($addedLines as $relPath => $lineNums) {
     }
 }
 
-$lineDelta     = $overallCoverage['line'] - $masterCoverage['line'];
-$methodDelta   = $overallCoverage['method'] - $masterCoverage['method'];
-$overallPassed = $overallCoverage['line'] >= $masterCoverage['line'] && $overallCoverage['method'] >= $masterCoverage['method'];
+// Master deltas are report-only — they appear in the table but do not gate the build.
+$lineDelta   = $overallCoverage['line'] - $masterCoverage['line'];
+$methodDelta = $overallCoverage['method'] - $masterCoverage['method'];
 
 printf("Overall line coverage:   %.2f%%\n", $overallCoverage['line']);
 printf("Overall method coverage: %.2f%%\n", $overallCoverage['method']);
@@ -182,31 +243,24 @@ $rows = [
     sprintf('| Method coverage | %.2f%% | %.2f%% | %+.2f%% |', $overallCoverage['method'], $masterCoverage['method'], $methodDelta),
 ];
 
+// No new executable lines (docs/test-only/refactor PRs): nothing to gate — pass.
 if ($totalExecutable === 0) {
     echo "No new executable statements — skipping patch coverage check.\n";
 
     $rows[] = '';
     $rows[] = 'No new executable statements — patch coverage check skipped.';
     $rows[] = '';
-    $rows[] = $overallPassed
-        ? ':white_check_mark: Coverage check passed.'
-        : sprintf(':x: **FAIL**: Overall coverage decreased (line: %+.2f%%, method: %+.2f%%)', $lineDelta, $methodDelta);
+    $rows[] = ':white_check_mark: Coverage check passed.';
 
     postPrComment(implode("\n", $rows));
-
-    if (!$overallPassed) {
-        printf("\nFAIL: Overall coverage decreased\n");
-        printf("Peak memory: %.2f MB\n", memory_get_peak_usage(true) / 1024 / 1024);
-        exit(1);
-    }
 
     printf("Peak memory: %.2f MB\n", memory_get_peak_usage(true) / 1024 / 1024);
     exit(0);
 }
 
+// The only gate: enough of the newly added lines must be covered.
 $patchCoverage = ($coveredAdded / $totalExecutable) * 100;
-$patchPassed   = $patchCoverage >= $minPatchCoverage;
-$passed        = $patchPassed && $overallPassed;
+$passed        = $patchCoverage >= $minPatchCoverage;
 
 printf("Patch coverage: %.2f%% (%d/%d new statements covered)\n", $patchCoverage, $coveredAdded, $totalExecutable);
 
@@ -220,14 +274,10 @@ if (!empty($uncoveredFiles)) {
 $rows[] = sprintf('| PR patch coverage | %.2f%% (%d/%d statements) | — | — |', $patchCoverage, $coveredAdded, $totalExecutable);
 $rows[] = '';
 
-if (!$patchPassed) {
-    $rows[] = sprintf(':x: **FAIL**: Patch coverage %.2f%% is below minimum %.2f%%', $patchCoverage, $minPatchCoverage);
-}
-if (!$overallPassed) {
-    $rows[] = sprintf(':x: **FAIL**: Overall coverage decreased (line: %+.2f%%, method: %+.2f%%)', $lineDelta, $methodDelta);
-}
 if ($passed) {
     $rows[] = sprintf(':white_check_mark: **PASS**: Patch coverage %.2f%% meets minimum %.2f%%', $patchCoverage, $minPatchCoverage);
+} else {
+    $rows[] = sprintf(':x: **FAIL**: Patch coverage %.2f%% is below minimum %.2f%%', $patchCoverage, $minPatchCoverage);
 }
 
 postPrComment(implode("\n", $rows));

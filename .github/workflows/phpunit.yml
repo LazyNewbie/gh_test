@@ -17,6 +17,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           path: repo
+          fetch-depth: 0
 
       - name: Checkout gh-reports branch
         uses: actions/checkout@v4
