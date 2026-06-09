@@ -42,6 +42,6 @@ class Repo2Test extends TestCase
     public function getString4MustReturnString(): void
     {
         $r = new Repo2();
-        $this->assertEquals("string 4", $r->getString3());
+        $this->assertEquals("string 4", $r->getString4());
     }
 }

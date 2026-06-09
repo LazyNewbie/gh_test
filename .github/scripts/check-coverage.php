@@ -192,6 +192,7 @@ const COMMENT_MARKER = '<!-- pr-coverage-report -->';
 $cloverCoverage  = parseClover($prCloverFile);
 $addedLines      = getAddedLines($baseBranch);
 $repoRoot        = rtrim((string)shell_exec('git rev-parse --show-toplevel'), "\n");
+$commitHash      = rtrim((string)shell_exec('git rev-parse HEAD'), "\n");
 $overallCoverage = getOverallCoverage($prCloverFile);
 $masterCoverage  = getOverallCoverage($masterCloverFile);
 
@@ -233,6 +234,8 @@ printf("Master line coverage:    %.2f%%\n", $masterCoverage['line']);
 printf("Master method coverage:  %.2f%%\n", $masterCoverage['method']);
 
 $rows = [
+    sprintf('Coverage report for commit: %s', $commitHash),
+    '',
     '## Coverage Report',
     '',
     '| Metric | PR | Master | Master Change |',
