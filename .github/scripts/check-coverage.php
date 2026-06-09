@@ -161,8 +161,6 @@ function postPrComment(string $body): void
 
     $body = COMMENT_MARKER . "\n" . $body;
 
-    echo "Posting PR comment:\n$body\n";
-
     $existingId = findExistingCommentId($prNum, $repo);
 
     if ($existingId !== null) {
