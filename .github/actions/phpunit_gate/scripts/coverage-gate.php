@@ -270,6 +270,7 @@ if ($passed) {
     printf("Peak memory: %.2f MB\n", memory_get_peak_usage(true) / 1024 / 1024);
     exit(0);
 } else {
+    postPrComment(implode("\n", $commentRows), $prNumber, $repository);
     printf("\nFAIL\n");
     printf("Peak memory: %.2f MB\n", memory_get_peak_usage(true) / 1024 / 1024);
     exit(1);
