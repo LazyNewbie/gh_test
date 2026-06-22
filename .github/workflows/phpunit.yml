@@ -1,3 +1,4 @@
+
 name: EXADS Pipeline 1
 
 on:
@@ -16,11 +17,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           path: repo
-
-      # - name: show env val
-      #   shell: bash
-      #   run: |
-      #     echo "BRANCH_NAME: $BRANCH_NAME"
+          fetch-depth: 0
 
       - name: Checkout gh-reports branch
         uses: actions/checkout@v4
@@ -37,19 +34,55 @@ jobs:
           secrets_EXADSBOT_ACTIONS_SSH_KEY: ${{ secrets.EXADSBOT_ACTIONS_SSH_KEY }}
           coverage_report_path: gh_reports/coverage/pr_report_clover.xml
 
-      # - name: Run test suite and get coverage report
-      #   run: |
-      #     cd repo
-      #     composer run-script --timeout=0 test:run:coverage -- --coverage-clover=../gh_reports/coverage/pr_report_clover.xml
+      - name: Install dependencies
+        run: |
+          cd repo
+          composer install --no-interaction --prefer-dist --optimize-autoloader --ignore-platform-reqs
 
-      - name: Create coverage report comment
-        uses: lucassabreu/comment-coverage-clover@v0.13.0
+      - name: Run test suite and get coverage report
+        id: run_tests
+        run: |
+          cd repo
+          composer run-script --timeout=0 test:run:coverage -- --coverage-clover=../gh_reports/coverage/pr_report_clover.xml
+
+#      - name: Report phpunit failure
+#        if: failure() && steps.run_tests.outcome == 'failure'
+#        env:
+#          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#          PR_NUMBER: ${{ github.event.pull_request.number }}
+#        run: |
+#          cd repo && php .github/scripts/report-phpunit-failure.php
+
+
+#      # Min PR code coverage = 80%
+#      - name: Check patch coverage
+#        env:
+#          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#          PR_NUMBER: ${{ github.event.pull_request.number }}
+#        run: |
+#          cd repo/shared_workflows/.github/scripts/php/code-coverage \
+#          && php check-coverage.php \
+#          80 \
+#          ../gh_reports/coverage/pr_report_clover.xml \
+#          ../gh_reports/coverage/master_report_clover.xml \
+#          "origin/${{ github.base_ref }}"
+
+
+      - name: Modify code coverage report msg on failure
+        if: failure() && steps.run_tests.outcome == 'failure'
+        uses: ./repo/.github/actions/phpunit_gate
         with:
-          with-chart: false
-          with-table: true
-          only-with-cover: true
-          show-percentage-change-on-table: true
-          with-branches: false
-          file: gh_reports/coverage/pr_report_clover.xml
-          base-file: gh_reports/coverage/master_report_clover.xml
-          max-line-coverage-decrease: "0.1"
+          on-fail-msg: true
+          show-error-report: 0
+          pr-report-clover: " "
+          master-report-clover: " "
+          pr-repo-location: " "
+
+
+      - name: Apply patch coverage gate
+        uses: ./repo/.github/actions/phpunit_gate
+        with:
+          min-patch-coverage: 80    # Min Patch code coverage = 80%
+          pr-report-clover: ${{ github.workspace }}/gh_reports/coverage/pr_report_clover.xml
+          master-report-clover: ${{ github.workspace }}/gh_reports/coverage/master_report_clover.xml
+          pr-repo-location: ${{ github.workspace }}/repo

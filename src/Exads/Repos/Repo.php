@@ -17,6 +17,7 @@ class Repo
 
     public function getString3(): string
     {
+        // new commit
         return "string 3";
     }
 
@@ -30,4 +31,8 @@ class Repo
         return "string 5";
     }
 
+    public function getString6(): string
+    {
+        return "string 6";
+    }
 }

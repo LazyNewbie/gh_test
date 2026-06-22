@@ -1,0 +1,56 @@
+name: PHPUnit coverage gate
+description: Check patch coverage or report a PHPUnit run failure
+
+inputs:
+  min-patch-coverage:
+    description: 'Minimum acceptable patch coverage threshold, percentage 0..100'
+    required: true
+    type: integer
+  pr-report-clover:
+    description: 'Absolute path to the Clover XML coverage report for the PR branch'
+    required: true
+    type: string
+  master-report-clover:
+    description: 'Absolute path to the Clover XML coverage report for the master branch'
+    required: true
+    type: string
+  pr-repo-location:
+    description: 'Absolute path to the repository location'
+    required: true
+    type: string
+  on-fail-msg:
+    description: 'When true, posts a PHPUnit failure comment instead of running the coverage gate (use when the test suite itself failed)'
+    required: false
+    default: false
+    type: boolean
+
+
+runs:
+  using: "composite"
+  steps:
+    - name: Check patch coverage
+      if: ${{ inputs.on-fail-msg == 'false' }}
+      shell: bash
+      env:
+        GH_TOKEN: ${{ github.token }}
+      run: |
+        php "$GITHUB_ACTION_PATH/scripts/coverage-gate.php" \
+        "${{ inputs.min-patch-coverage }}" \
+        "${{ inputs.pr-report-clover }}" \
+        "${{ inputs.master-report-clover }}" \
+        "origin/${{ github.base_ref }}" \
+        "${{ github.event.pull_request.number }}" \
+        "${{ github.repository }}" \
+        "${{ inputs.pr-repo-location }}"
+        
+
+    - name: Report PHPUnit failure
+      if: ${{ inputs.on-fail-msg == 'true' }}
+      shell: bash
+      env:
+        GH_TOKEN: ${{ github.token }}
+      run: |
+        php "$GITHUB_ACTION_PATH/scripts/report-phpunit-failure.php" \
+        "${{ github.event.pull_request.number }}" \
+        "${{ github.repository }}" \
+        "${{ github.sha }}"
