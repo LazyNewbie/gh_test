@@ -7,7 +7,7 @@ class Repo
 
     public function getString(): string
     {
-        return "string 111";
+        return "string 1";
     }
 
     public function getString2(): string
@@ -31,4 +31,8 @@ class Repo
         return "string 5";
     }
 
+    public function getString6(): string
+    {
+        return "string 6";
+    }
 }
