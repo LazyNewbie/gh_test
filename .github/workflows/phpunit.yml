@@ -45,13 +45,13 @@ jobs:
           cd repo
           composer run-script --timeout=0 test:run:coverage -- --coverage-clover=../gh_reports/coverage/pr_report_clover.xml
 
-      - name: Report phpunit failure
-        if: failure() && steps.run_tests.outcome == 'failure'
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          PR_NUMBER: ${{ github.event.pull_request.number }}
-        run: |
-          cd repo && php .github/scripts/report-phpunit-failure.php
+#      - name: Report phpunit failure
+#        if: failure() && steps.run_tests.outcome == 'failure'
+#        env:
+#          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#          PR_NUMBER: ${{ github.event.pull_request.number }}
+#        run: |
+#          cd repo && php .github/scripts/report-phpunit-failure.php
 
 
 #      # Min PR code coverage = 80%
@@ -66,6 +66,17 @@ jobs:
 #          ../gh_reports/coverage/pr_report_clover.xml \
 #          ../gh_reports/coverage/master_report_clover.xml \
 #          "origin/${{ github.base_ref }}"
+
+
+      - name: Modify code coverage report msg on failure
+        if: failure() && steps.run_tests.outcome == 'failure'
+        uses: ./repo/.github/actions/phpunit_gate
+        with:
+          on-fail-msg: true
+          show-error-report: 0
+          pr-report-clover: " "
+          master-report-clover: " "
+          pr-repo-location: " "
 
 
       - name: Apply patch coverage gate
