@@ -54,14 +54,24 @@ jobs:
           cd repo && php .github/scripts/report-phpunit-failure.php
 
 
-      # Min PR code coverage = 80%
-      - name: Check patch coverage
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          PR_NUMBER: ${{ github.event.pull_request.number }}
-        run: |
-          cd repo && php .github/scripts/check-coverage.php \
-          80 \
-          ../gh_reports/coverage/pr_report_clover.xml \
-          ../gh_reports/coverage/master_report_clover.xml \
-          "origin/${{ github.base_ref }}"
+#      # Min PR code coverage = 80%
+#      - name: Check patch coverage
+#        env:
+#          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#          PR_NUMBER: ${{ github.event.pull_request.number }}
+#        run: |
+#          cd repo/shared_workflows/.github/scripts/php/code-coverage \
+#          && php check-coverage.php \
+#          80 \
+#          ../gh_reports/coverage/pr_report_clover.xml \
+#          ../gh_reports/coverage/master_report_clover.xml \
+#          "origin/${{ github.base_ref }}"
+
+
+      - name: Apply patch coverage gate
+        uses: ./repo/.github/actions/phpunit_gate
+        with:
+          min-patch-coverage: 80    # Min Patch code coverage = 80%
+          pr-report-clover: ${{ github.workspace }}/gh_reports/coverage/pr_report_clover.xml
+          master-report-clover: ${{ github.workspace }}/gh_reports/coverage/master_report_clover.xml
+          pr-repo-location: ${{ github.workspace }}/repo
